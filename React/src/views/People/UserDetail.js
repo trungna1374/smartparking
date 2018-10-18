@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Badge, Card, CardBody, CardHeader, Col, Row, Table, Button } from 'reactstrap';
+import { Badge, Card, CardBody, CardHeader, Col, Row, Table, Button, CardFooter } from 'reactstrap';
 import axios from "axios";
 
 class UserDetail extends Component {
@@ -9,7 +9,7 @@ class UserDetail extends Component {
             userDetails: null
         }
     }
-    getUserRegisterDetailData = () => axios.get("http://localhost:4000/getDetailUser/" + this.props.match.params.id)
+    getUserRegisterDetailData = () => axios.get("/getDetailUser/" + this.props.match.params.id)
         .then((res) => res.data)
     componentWillMount() {
         if (this.state.userDetails == null) {
@@ -38,6 +38,10 @@ class UserDetail extends Component {
                         <td>{this.state.userDetails.address}</td>
                     </tr>
                     <tr>
+                        <td>Email</td>
+                        <td>{this.state.userDetails.email}</td>
+                    </tr>
+                    <tr>
                         <td>Date Registered</td>
                         <td>{this.state.userDetails.createDate}</td>
                     </tr>
@@ -63,6 +67,7 @@ class UserDetail extends Component {
                         <tr>
                             <th>Plate Number</th>
                             <th>RFID</th>
+                            <th>Status</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -74,35 +79,44 @@ class UserDetail extends Component {
                                 <td>
                                     {value.UID}
                                 </td>
+                                <td>
+                                    <Badge color={value.status === 1 ? "success" : "danger"}>{value.status === 1 ? "Active" : "Deactive"}</Badge>
+                                </td>
                             </tr>
                         ))}
                     </tbody>
                 </Table>)
+    }
+    printAllData = () => {
+        if (this.state.userDetails != null)
+            return (<Row>
+                <Col lg={6}>
+                    <Card>
+                        <CardHeader>
+                            <strong><i className="pr-1"></i>Account: {this.state.userDetails.accountId}</strong>
+                        </CardHeader>
+                        <CardBody>
+                            {this.printData()}
+                        </CardBody>
+                        <CardHeader>
+                            <strong><i className="pr-1"></i>Plate Number - RFID</strong>
+                        </CardHeader>
+                        <CardBody>
+                            {this.printPlateData()}
+                        </CardBody>
+                        <CardFooter>
+                            <Button className="mr-1 mb-1" href={"#/people/userupdate/" + this.props.match.params.id} color="info"><i className="fa fa-edit"></i> Update</Button>
+                        </CardFooter>
+                    </Card>
+                </Col>
+            </Row>)
     }
 
     render() {
         console.log(this.state.userDetails)
         return (
             <div className="animated fadeIn">
-                <Row>
-                    <Col lg={6}>
-                        <Card>
-                            <CardHeader>
-                                <strong><i className="pr-1"></i>User Id: {this.props.match.params.id}</strong>
-                            </CardHeader>
-                            <CardBody>
-                                {this.printData()}
-                            </CardBody>
-                            <CardHeader>
-                                <strong><i className="pr-1"></i>Plate Number - RFID</strong>
-                            </CardHeader>
-                            <CardBody>
-                                {this.printPlateData()}
-                                <Button size="lg" className="fa fa-edit mr-1 mb-1" color="info" href={"#/people/userupdate/" + this.props.match.params.id}> Update</Button>
-                            </CardBody>
-                        </Card>
-                    </Col>
-                </Row>
+                {this.printAllData()}
             </div>
         );
     }

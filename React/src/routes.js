@@ -2,9 +2,15 @@ import React from 'react';
 import Loadable from 'react-loadable'
 
 import DefaultLayout from './containers/DefaultLayout';
-import People from './views/People/People';
+import People from './views/People/UserRegister';
 import UserDetail from './views/People/UserDetail';
 import UserUpdate from './views/People/UserUpdate';
+import StaffUpdate from './views/People/StaffUpdate';
+import UserRegister from './views/People/UserRegister';
+import Staff from './views/People/Staff';
+import UserRegisterAdd from './views/People/UserRegisterAdd';
+import StaffAdd from './views/People/StaffAdd';
+import ParkLocation from './views/Map/ParkLocation';
 
 function Loading() {
   return <div>Loading...</div>;
@@ -231,8 +237,14 @@ const routes = [
   { path: '/users', exact: true, name: 'Users', component: Users },
   { path: '/users/:id', exact: true, name: 'User Details', component: User },
   { path: '/people', exact: true, name: 'People', component: People },
+  { path: '/people/userregister', exact: true, name: 'User Register', component: UserRegister },
+  { path: '/people/staff', exact: true, name: 'Staff', component: Staff },
   { path: '/people/userdetail/:id', exact: true, name: 'User Detail', component: UserDetail },
-  { path: '/people/userupdate/:id', exact: true, name: 'User Update', component: UserUpdate }
+  { path: '/people/userupdate/:id', exact: true, name: 'User Update', component: UserUpdate },
+  { path: '/people/staffupdate/:id', exact: true, name: 'Staff Update', component: StaffUpdate },
+  { path: '/people/useradd', exact: true, name: 'User Add', component: UserRegisterAdd },
+  { path: '/people/staffadd', exact: true, name: 'Staff Add', component: StaffAdd },
+  { path: '/map', exact: true, name: 'Map', component: ParkLocation }
 ];
 
 export default routes;

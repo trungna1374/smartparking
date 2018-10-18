@@ -145,9 +145,26 @@ export default {
       ],
     },
     {
-      name: 'People',
-      url: '/people',
-      icon: 'icon-people',
+      name:'Map',
+      url:'/map',
+      icon:'icon-map'
     },
-  ],
+    {
+      name: 'People',
+      url: '/People',
+      icon: 'icon-people',
+      children: [
+        {
+          name: 'User Register',
+          url: '/people/userregister',
+          icon: 'icon-bell',
+        },
+        {
+          name: 'Staff',
+          url: '/people/staff',
+          icon: 'icon-bell',
+        },
+      ],
+    },
+  ]
 };

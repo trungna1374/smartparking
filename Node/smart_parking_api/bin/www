@@ -7,6 +7,8 @@
 var app = require('../app');
 var debug = require('debug')('smart-parking-api:server');
 var http = require('http');
+const socketIO = require('socket.io')
+const axios = require("axios");
 
 /**
  * Get port from environment and store in Express.
@@ -20,6 +22,29 @@ app.set('port', port);
  */
 
 var server = http.createServer(app);
+
+const io = socketIO(server)
+
+// This is what the socket.io syntax is like, we will work this later
+io.on('connection', socket => {
+  console.log("New client connected"), setInterval(
+    () => getApiAndEmit(socket),
+    1000
+  );
+
+  const getApiAndEmit = async socket => {
+    try {
+      const res = await axios.get("http://localhost:4000/getParkData");
+      socket.emit("getPark", res.data);
+    } catch (error) {
+      console.error(`Error: ${error.code}`);
+    }
+  };
+
+  socket.on('disconnect', () => {
+    console.log('user disconnected')
+  })
+})
 
 /**
  * Listen on provided port, on all network interfaces.
