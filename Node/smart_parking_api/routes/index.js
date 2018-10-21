@@ -109,6 +109,41 @@ router.post('/updateStaffData', async (req, res, next) => {
   })
 })
 
+router.post('/removeStaffData', async (req, res, next) => {
+  con.beginTransaction(function (err) {
+    if (err) {
+      return res.send(err)
+    }
+    var accountId = req.body.accountid
+
+    let processQuery = async () => {
+      try {
+        await promiseRemoveStaffData(accountId)
+        await promiseCommit(res)
+      } catch (e) {
+        console.log(e)
+        con.rollback()
+        res.send(e)
+      }
+
+    }
+    processQuery()
+  })
+})
+
+let promiseRemoveStaffData = (accountId) => {
+  return new Promise((resolve, reject) => {
+    con.query("update staff set status=0 where accountId='" + accountId + "';",
+      function (err, result) {
+        if (err) {
+          reject(err)
+        } else {
+          resolve(result)
+        }
+      })
+  })
+}
+
 router.post('/addStaffData', async (req, res, next) => {
   con.beginTransaction(function (err) {
     if (err) {
@@ -380,6 +415,41 @@ let promiseCommit = (res) => {
   })
 }
 
+router.post('/removeUserData', async (req, res, next) => {
+  con.beginTransaction(function (err) {
+    if (err) {
+      return res.send(err)
+    }
+    var accountId = req.body.accountid
+
+    let processQuery = async () => {
+      try {
+        await promiseRemoveUserData(accountId)
+        await promiseCommit(res)
+      } catch (e) {
+        console.log(e)
+        con.rollback()
+        res.send(e)
+      }
+
+    }
+    processQuery()
+  })
+})
+
+let promiseRemoveUserData = (accountId) => {
+  return new Promise((resolve, reject) => {
+    con.query("update userregister set status=0 where accountId='" + accountId + "';",
+      function (err, result) {
+        if (err) {
+          reject(err)
+        } else {
+          resolve(result)
+        }
+      })
+  })
+}
+
 router.get('/getAvailableRFID', function (req, res, next) {
   con.query("select * from card where status=1", function (err, results) {
     if (err) throw err
@@ -392,7 +462,7 @@ router.get('/getAvailableRFID', function (req, res, next) {
 })
 
 router.get('/getParkData', function (req, res, next) {
-  con.query("select * from park", function (err, results) {
+  con.query("select * from park where status=1", function (err, results) {
     if (err) throw err
     result = []
     for (var i in results) {
@@ -431,5 +501,93 @@ router.get('/getParkDataByPark/:parkId', function (req, res, next) {
     res.json(result)
   })
 })
+
+router.post('/addParkData', async (req, res, next) => {
+  con.beginTransaction(function (err) {
+    if (err) {
+      return res.send(err)
+    }
+    var parkname = req.body.parkname
+    var address = req.body.address
+    var lat = req.body.lat
+    var lng = req.body.lng
+    var numOfSlot = req.body.numofslot
+    var numOfAvailableSlot = req.body.numofavailableslot
+
+    let processQuery = async () => {
+      try {
+        let parkId = await promiseCreateParkId()
+        await promiseInsertPark(parkId, parkname, address, lat, lng, numOfSlot, numOfAvailableSlot)
+        await promiseCommit(res)
+      } catch (e) {
+        console.log(e)
+        con.rollback()
+        res.send(e)
+      }
+    }
+    processQuery()
+  })
+})
+
+let promiseCreateParkId = () => {
+  return new Promise((resolve, reject) => {
+    con.query("select parkId from Park order by createDate DESC limit 1;",
+      function (err, result) {
+        if (err) {
+          return reject(err)
+        }
+        if (result.length == 0) {
+          resolve('p1')
+        } else {
+          resolve("p" + (parseInt(result[0].parkId.substring(1)) + 1))
+        }
+      })
+  })
+}
+
+let promiseInsertPark = (parkId, parkName, address, lat, lng, numOfSlot, numOfAvailableSlot) => {
+  return new Promise((resolve, reject) => {
+    con.query("insert into park value ('" + parkId + "','" + parkName + "','" + address + "'," + lat + "," + lng + "," + numOfSlot + "," + numOfAvailableSlot + ",0,1,now())",
+      function (err, result) {
+        if (err) {
+          return reject(err)
+        }
+        resolve(result)
+      })
+  })
+}
+
+router.post('/removeParkData', async (req, res, next) => {
+  con.beginTransaction(function (err) {
+    if (err) {
+      return res.send(err)
+    }
+    var parkId = req.body.parkid
+
+    let processQuery = async () => {
+      try {
+        await promiseRemovePark(parkId)
+        await promiseCommit(res)
+      } catch (e) {
+        console.log(e)
+        con.rollback()
+        res.send(e)
+      }
+    }
+    processQuery()
+  })
+})
+
+let promiseRemovePark = (parkId) => {
+  return new Promise((resolve, reject) => {
+    con.query("update park set status=0 where parkId='" + parkId + "'",
+      function (err, result) {
+        if (err) {
+          return reject(err)
+        }
+        resolve(result)
+      })
+  })
+}
 
 module.exports = router;

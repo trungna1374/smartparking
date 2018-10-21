@@ -1,13 +1,17 @@
 import React, { Component } from 'react';
 import ReactDOM from 'react-dom'
 import { Map, InfoWindow, Marker, GoogleApiWrapper } from 'google-maps-react';
-import { Card, CardHeader, CardBody, ButtonGroup, Button } from 'reactstrap';
-import axios from "axios";
+import { Card, CardHeader, CardBody, ButtonGroup, Button, Modal, ModalBody, ModalFooter, ModalHeader } from 'reactstrap';
 import socketIOClient from "socket.io-client";
 import SelectPlacesAutocomplete from "./SelectPlacesAutocomplete"
 import { ContextMenu, MenuItem, ContextMenuTrigger } from "react-contextmenu";
+import axios from "axios";
 import './react-contextmenu.css'
+import NewParkModal from './NewParkModal';
 
+const removePark = (parkId) => {
+    return axios.post('/removeParkData', parkId).then((res) => res.data)
+}
 class ParkLocation extends Component {
     constructor(props) {
         super(props);
@@ -15,14 +19,15 @@ class ParkLocation extends Component {
         this.state = {
             showingInfoWindow: false,
             showingNewInfoWindow: false,
-            activeMarker: {},
+            activeMarker: null,
             selectedPlace: {},
             data: null,
             endpoint: "http://localhost:4000",
             markerList: [],
             lat: 0,
-            lng: 0
-        };
+            lng: 0,
+            addParkModal: false
+        }
     }
 
     componentWillMount() {
@@ -30,7 +35,14 @@ class ParkLocation extends Component {
         const socket = socketIOClient(endpoint);
         socket.on("getPark", res => {
             if (JSON.stringify(this.state.data) !== JSON.stringify(res)) this.setState({ data: res })
-        });
+        })
+    }
+
+    addNewPark = (e) => {
+        this.setState({
+            addParkModal: !this.state.addParkModal,
+            showingNewInfoWindow: false
+        })
     }
 
     onMarkerClick = (props, marker, e) =>
@@ -39,14 +51,15 @@ class ParkLocation extends Component {
             activeMarker: marker,
             showingInfoWindow: true,
             showingNewInfoWindow: false
-        });
+        })
+
     onNewMarkerClick = (props, marker, e) =>
         this.setState({
             selectedPlace: props,
             activeMarker: marker,
             showingNewInfoWindow: true,
             showingInfoWindow: false
-        });
+        })
 
     onMapClicked = (mapProps, map, clickEvent) => {
         if (this.state.showingInfoWindow || this.state.showingNewInfoWindow) {
@@ -56,7 +69,7 @@ class ParkLocation extends Component {
                 activeMarker: null
             })
         }
-    };
+    }
 
     onMapRightClick = (mapProps, map, clickEvent) => {
         this.setState({
@@ -70,21 +83,38 @@ class ParkLocation extends Component {
     }
 
     handleClick = (e, data) => {
-        var markerNewList = this.state.markerList
-        markerNewList.push({ lat: this.state.lat, lng: this.state.lng })
         this.setState({
-            markerList: markerNewList
+            markerList: this.state.markerList.concat({ lat: this.state.lat, lng: this.state.lng })
         })
     }
 
     removeMarker = (e) => {
-        console.log("props")
-        // var markerNewList = this.state.markerList
-        // var index = markerNewList.indexOf(props)
-        // markerNewList.splice(1, index)
-        // this.setState({
-        //     markerList: markerNewList
-        // })
+        var value = { lat: this.state.activeMarker.position.lat(), lng: this.state.activeMarker.position.lng() }
+        var markerNewList = this.state.markerList
+        for (var index = 0; index < markerNewList.length; index++) {
+            if (JSON.stringify(markerNewList[index]) === JSON.stringify(value)) {
+                markerNewList.splice(index, 1)
+                break
+            }
+        }
+        this.setState({
+            markerList: markerNewList,
+            showingNewInfoWindow: false,
+            activeMarker: null,
+            addParkModal: false
+        })
+    }
+
+    removePark = (e) => {
+        var obj = { parkid: this.state.selectedPlace.id }
+        removePark(obj).then((response) => {
+            console.log(response)
+            this.setState({
+                activeMarker: null,
+                selectedPlace: null,
+                showingInfoWindow:false
+            })
+        })
     }
 
     printNewMaker = () => {
@@ -99,30 +129,26 @@ class ParkLocation extends Component {
 
     printNewInfoWindow = () => {
         return (
-            this.state.markerList.map((value, key) => (
-                <InfoWindow
-                    key={key}
-                    marker={this.state.activeMarker}
-                    visible={this.state.showingNewInfoWindow}
-                    onOpen={e => {
-                        this.onInfoWindowOpen(this.props, e);
-                    }}>
-                    <div id="iwc"></div>
-                </InfoWindow>
-            ))
+            <InfoWindow
+                marker={this.state.activeMarker}
+                visible={this.state.showingNewInfoWindow}
+                onOpen={e => {
+                    this.onNewInfoWindowOpen(e);
+                }}>
+                <div id={"newparkwindowinfo"}></div>
+            </InfoWindow>
         )
     }
 
-    onInfoWindowOpen(props, e) {
-        console.log(props)
-        const button = (<div>
+    onNewInfoWindowOpen(e) {
+        const content = (<div>
             <ButtonGroup vertical>
-                <Button onClick={this.removeMarker}>Add New Park</Button>
+                <Button onClick={this.addNewPark}>Add New Park</Button>
                 <Button onClick={this.removeMarker}>Remove Marker</Button>
             </ButtonGroup>
         </div>
         );
-        ReactDOM.render(React.Children.only(button), document.getElementById("iwc"));
+        ReactDOM.render(React.Children.only(content), document.getElementById("newparkwindowinfo"));
     }
 
     printMarker = () => {
@@ -130,8 +156,10 @@ class ParkLocation extends Component {
             return (
                 this.state.data.map((value, key) => (
                     < Marker key={key} onClick={this.onMarkerClick}
+                        id={value.parkId}
                         name={value.parkname}
                         availableSlot={value.numofavailableslot}
+                        label={value.numofavailableslot.toString()}
                         numOfNotparkCar={value.numofnotparkcar}
                         position={{ lat: value.lat, lng: value.lng }} />
                 ))
@@ -141,38 +169,47 @@ class ParkLocation extends Component {
     printInfoWindow = () => {
         if (this.state.data != null)
             return (
-                this.state.data.map((value, key) => (
-                    <InfoWindow
-                        key={key}
-                        marker={this.state.activeMarker}
-                        visible={this.state.showingInfoWindow}
-                    >
-                        <div>
-                            <h1>{this.state.selectedPlace.name}</h1>
-                            <table style={{ width: '100%' }}>
-                                <tbody>
-                                    <tr>
-                                        <td>
-                                            <h2>Available Slots</h2>
-                                        </td>
-                                        <td style={{ padding: '15px' }}>
-                                            <h2>{this.state.selectedPlace.availableSlot}</h2>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            <h2>Incoming</h2>
-                                        </td>
-                                        <td style={{ padding: '15px' }}>
-                                            <h2>{this.state.selectedPlace.numOfNotparkCar}</h2>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </InfoWindow>
-                ))
+                <InfoWindow
+                    marker={this.state.activeMarker}
+                    visible={this.state.showingInfoWindow}
+                    onOpen={e => {
+                        this.onInfoWindowOpen(e);
+                    }}
+                >
+                    <div id="parkwindowinfo"></div>
+                </InfoWindow>
             )
+    }
+
+    onInfoWindowOpen(e) {
+        const content = (<div>
+            <h1>{this.state.selectedPlace.name}</h1>
+            <table style={{ width: '100%' }}>
+                <tbody>
+                    <tr>
+                        <td>
+                            <h2>Available Slots</h2>
+                        </td>
+                        <td style={{ padding: '15px' }}>
+                            <h2>{this.state.selectedPlace.availableSlot}</h2>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <h2>Incoming</h2>
+                        </td>
+                        <td style={{ padding: '15px' }}>
+                            <h2>{this.state.selectedPlace.numOfNotparkCar}</h2>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <ButtonGroup>
+                <Button onClick={this.removePark}>Remove Park</Button>
+            </ButtonGroup>
+        </div>
+        );
+        ReactDOM.render(React.Children.only(content), document.getElementById("parkwindowinfo"));
     }
 
     render() {
@@ -213,6 +250,11 @@ class ParkLocation extends Component {
                                 Add Marker
                             </MenuItem>
                         </ContextMenu>
+                        <NewParkModal
+                            modal={this.state.addParkModal}
+                            activeMarker={this.state.activeMarker}
+                            removeMarker={this.removeMarker}
+                            toggle={this.addNewPark} />
                     </CardBody>
                 </Card>
             </div >

@@ -5,6 +5,7 @@ import axios from "axios";
 
 // require("bootstrap/less/bootstrap.less");
 const getStaffData = () => axios.get("/getAllStaff").then((res) => res.data)
+const removeStaffData = (userData) => axios.post("/removeStaffData", userData).then((res) => res.data)
 class Staff extends Component {
     constructor(props) {
         super(props);
@@ -39,6 +40,18 @@ class Staff extends Component {
         this.setState({ activePage: pageNumber });
     }
 
+    onRemoveStaff = (e, accountId) => {
+        removeStaffData({ accountid: accountId }).then((response) => {
+            if (response === "success") {
+                getStaffData().then((res) => {
+                    this.setState({
+                        staffData: res
+                    })
+                })
+            }
+        })
+    }
+
     printStaffData = () => {
         if (this.state.staffData != null) {
             return (<Table responsive hover>
@@ -68,7 +81,7 @@ class Staff extends Component {
                             </td>
                             <td>
                                 <Button className="fa fa-edit mr-1 mb-1" color="info" href={"#/people/staffUpdate/" + value.accountId}></Button>
-                                <Button className="fa fa-trash-o mr-1 mb-1" color="danger" href={"#/people/staffDelete/" + value.accountId}></Button>
+                                <Button className="fa fa-trash-o mr-1 mb-1" color="danger" onClick={e => this.onRemoveStaff(e, value.accountId)}></Button>
                             </td>
                         </tr>
                     ))}

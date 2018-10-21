@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Badge, Button, Table, Row, Col, Card, CardBody, CardFooter, CardHeader, Pagination, PaginationItem, PaginationLink } from 'reactstrap';
+import { Badge, Button, Table, Row, Card, CardBody, CardHeader, Pagination, PaginationItem, PaginationLink } from 'reactstrap';
 import axios from "axios";
 // import Pagination from "react-js-pagination";
 
