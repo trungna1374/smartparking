@@ -105,7 +105,7 @@ class UserDetail extends Component {
                             {this.printPlateData()}
                         </CardBody>
                         <CardFooter>
-                            <Button className="mr-1 mb-1" href={"#/people/userupdate/" + this.props.match.params.id} color="info"><i className="fa fa-edit"></i> Update</Button>
+                            <Button className="mr-1 mb-1" href={"#/userregister/userupdate/" + this.props.match.params.id} color="info"><i className="fa fa-edit"></i> Update</Button>
                         </CardFooter>
                     </Card>
                 </Col>

@@ -156,12 +156,12 @@ export default {
       children: [
         {
           name: 'User Register',
-          url: '/people/userregister',
+          url: '/userregister',
           icon: 'icon-bell',
         },
         {
           name: 'Staff',
-          url: '/people/staff',
+          url: '/staff',
           icon: 'icon-bell',
         },
       ],

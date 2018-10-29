@@ -236,14 +236,13 @@ const routes = [
   { path: '/charts', name: 'Charts', component: Charts },
   { path: '/users', exact: true, name: 'Users', component: Users },
   { path: '/users/:id', exact: true, name: 'User Details', component: User },
-  { path: '/people', exact: true, name: 'People', component: People },
-  { path: '/people/userregister', exact: true, name: 'User Register', component: UserRegister },
-  { path: '/people/staff', exact: true, name: 'Staff', component: Staff },
-  { path: '/people/userdetail/:id', exact: true, name: 'User Detail', component: UserDetail },
-  { path: '/people/userupdate/:id', exact: true, name: 'User Update', component: UserUpdate },
-  { path: '/people/staffupdate/:id', exact: true, name: 'Staff Update', component: StaffUpdate },
-  { path: '/people/useradd', exact: true, name: 'User Add', component: UserRegisterAdd },
-  { path: '/people/staffadd', exact: true, name: 'Staff Add', component: StaffAdd },
+  { path: '/userregister', exact: true, name: 'User Register', component: UserRegister },
+  { path: '/staff', exact: true, name: 'Staff', component: Staff },
+  { path: '/userregister/userdetail/:id', exact: true, name: 'User Detail', component: UserDetail },
+  { path: '/userregister/userupdate/:id', exact: true, name: 'User Update', component: UserUpdate },
+  { path: '/staff/staffupdate/:id', exact: true, name: 'Staff Update', component: StaffUpdate },
+  { path: '/userregister/useradd', exact: true, name: 'User Add', component: UserRegisterAdd },
+  { path: '/staff/staffadd', exact: true, name: 'Staff Add', component: StaffAdd },
   { path: '/map', exact: true, name: 'Map', component: ParkLocation }
 ];
 
