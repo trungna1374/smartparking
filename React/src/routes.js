@@ -11,6 +11,7 @@ import Staff from './views/People/Staff';
 import UserRegisterAdd from './views/People/UserRegisterAdd';
 import StaffAdd from './views/People/StaffAdd';
 import ParkLocation from './views/Map/ParkLocation';
+import LiveStream from './views/LiveStream/LiveStream';
 
 function Loading() {
   return <div>Loading...</div>;
@@ -243,7 +244,8 @@ const routes = [
   { path: '/staff/staffupdate/:id', exact: true, name: 'Staff Update', component: StaffUpdate },
   { path: '/userregister/useradd', exact: true, name: 'User Add', component: UserRegisterAdd },
   { path: '/staff/staffadd', exact: true, name: 'Staff Add', component: StaffAdd },
-  { path: '/map', exact: true, name: 'Map', component: ParkLocation }
+  { path: '/map', exact: true, name: 'Map', component: ParkLocation },
+  { path: '/livestream', exact: true, name: 'Live Stream', component: LiveStream }
 ];
 
 export default routes;

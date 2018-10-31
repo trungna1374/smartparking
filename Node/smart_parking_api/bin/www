@@ -10,6 +10,8 @@ var http = require('http');
 const socketIO = require('socket.io')
 const axios = require("axios");
 var fs = require('fs');
+var spawn = require('child_process').spawn;
+var proc;
 
 /**
  * Get port from environment and store in Express.

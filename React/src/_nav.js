@@ -166,5 +166,10 @@ export default {
         },
       ],
     },
+    {
+      name:'Live Stream',
+      url:'/livestream',
+      icon:'icon-map'
+    },
   ]
 };
