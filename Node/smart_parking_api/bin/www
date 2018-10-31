@@ -9,6 +9,7 @@ var debug = require('debug')('smart-parking-api:server');
 var http = require('http');
 const socketIO = require('socket.io')
 const axios = require("axios");
+var fs = require('fs');
 
 /**
  * Get port from environment and store in Express.
@@ -26,25 +27,64 @@ var server = http.createServer(app);
 const io = socketIO(server)
 
 // This is what the socket.io syntax is like, we will work this later
+var sockets = {};
 io.on('connection', socket => {
-  console.log("New client connected"), setInterval(
-    () => getApiAndEmit(socket),
-    1000
-  );
+  sockets[socket.id] = socket;
+  console.log("Connected Socket")
 
   const getApiAndEmit = async socket => {
-    try {
-      const res = await axios.get("http://localhost:4000/getParkData");
-      socket.emit("getPark", res.data);
-    } catch (error) {
-      console.error(`Error: ${error.code}`);
+    if (app.get('readPark')) {
+      try {
+        const res = await axios.get("http://localhost:4000/getParkData");
+        socket.emit("getPark", res.data);
+      } catch (error) {
+        console.error(`Error: ${error.code}`);
+      }
     }
   };
 
+  socket.on('subscribeToGetPark', (interval) => {
+    console.log('client is subscribing to timer with interval ', interval);
+    app.set('readPark', true);
+    setInterval(() => getApiAndEmit(socket), interval);
+  });
+
   socket.on('disconnect', () => {
+    delete sockets[socket.id];
+    app.set('readPark', false);
     console.log('user disconnected')
+    // no more sockets, kill the stream
+    if (Object.keys(sockets).length == 0) {
+      app.set('watchingFile', false);
+      if (proc) proc.kill();
+      fs.unwatchFile('./stream/image_stream.jpg');
+    }
   })
+
+  socket.on('start-stream', function() {
+    startStreaming(io);
+  });
 })
+
+function startStreaming(io) {
+
+  if (app.get('watchingFile')) {
+    io.sockets.emit('liveStream', 'image_stream.jpg?_t=' + (Math.random() * 100000));
+    return;
+  }
+
+  var args = ["-w", "640", "-h", "480", "-o", "./stream/image_stream.jpg", "-t", "999999999", "-tl", "100"];
+  proc = spawn('raspistill', args);
+
+  console.log('Watching for changes...');
+
+  app.set('watchingFile', true);
+
+  fs.watchFile('./stream/image_stream.jpg', function (current, previous) {
+    io.sockets.emit('liveStream', 'image_stream.jpg?_t=' + (Math.random() * 100000));
+  })
+
+}
 
 /**
  * Listen on provided port, on all network interfaces.

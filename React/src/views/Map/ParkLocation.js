@@ -37,10 +37,15 @@ class ParkLocation extends Component {
 
     componentWillMount() {
         const { endpoint } = this.state;
-        const socket = socketIOClient(endpoint);
-        socket.on("getPark", res => {
+        this.socket = socketIOClient(endpoint);
+        this.socket.on("getPark", res => {
             if (JSON.stringify(this.state.data) !== JSON.stringify(res)) this.setState({ data: res })
         })
+        this.socket.emit('subscribeToGetPark', 1000); 
+    }
+
+    componentWillUnmount() {
+        this.socket.close();
     }
 
     addNewPark = (e) => {
