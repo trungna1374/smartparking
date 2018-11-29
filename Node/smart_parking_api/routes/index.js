@@ -187,7 +187,7 @@ let promiseInsertStaff = (accountId, username, phone, address, email, status) =>
 }
 
 router.get('/getAllUserRegister', function (req, res, next) {
-  con.query("select t1.accountId, t1.username,t1.createBy,t1.phone,t1.address, t2.numberPlate,t1.status, DATE_FORMAT(t1.createDate,'%Y-%m-%d') as createDate, DATE_FORMAT(t1.availableDate,'%Y-%m-%d') as availableDate " +
+  con.query("select t1.accountId, t1.username,t1.createBy,t1.phone,t1.address, t2.numberPlate,t1.status, DATE_FORMAT(t1.createDate,'%Y-%m-%d') as createDate " +
     "from (select * from userregister)t1 left join (select accountId,count(accountId) as numberplate from carplate GROUP BY accountId) t2 on t1.accountId = t2.accountId ", function (err, results) {
       if (err) throw err
       result = []
@@ -200,7 +200,6 @@ router.get('/getAllUserRegister', function (req, res, next) {
           address: results[i].address,
           createBy: results[i].createBy,
           createDate: results[i].createDate,
-          availableDate: results[i].availableDate,
           numOfPlate: results[i].numberPlate == null ? 0 : results[i].numberPlate,
           status: results[i].status
         }
@@ -212,8 +211,8 @@ router.get('/getAllUserRegister', function (req, res, next) {
 
 router.get('/getDetailUser/:accountId', function (req, res, next) {
   var accountId = req.params['accountId']
-  con.query("select *, DATE_FORMAT(createDate,'%d-%m-%Y') as createDate,DATE_FORMAT(availableDate,'%Y-%m-%d') as availableDate from userregister where accountId='" + accountId + "';" +
-    "select id,carNumPlate,UID,status from carplate where accountId='" + accountId + "';" +
+  con.query("select *, DATE_FORMAT(createDate,'%d-%m-%Y') as createDate from userregister where accountId='" + accountId + "';" +
+    "select id,carNumPlate,UID,status,DATE_FORMAT(availableDate,'%Y-%m-%d') as availableDate from carplate where accountId='" + accountId + "';" +
     "select UID as value from card where status=1", function (err, results) {
       if (err) res.send(err)
       obj = { accountId: "", username: "", phone: "", address: "", email: "", createBy: "", createDate: "", status: 0, listOfPlate: [], listOfRfid: [] }
@@ -224,7 +223,6 @@ router.get('/getDetailUser/:accountId', function (req, res, next) {
       obj.email = results[0][0].email
       obj.createBy = results[0][0].createBy
       obj.createDate = results[0][0].createDate
-      obj.availableDate = results[0][0].availableDate
       obj.status = results[0][0].status
       for (var i in results[1]) {
         obj.listOfPlate.push(results[1][i])
@@ -243,7 +241,6 @@ router.post('/updateUserData', async (req, res, next) => {
     }
     var accountId = req.body.accountId
     var username = req.body.username.toLowerCase().trim().replace(/  +/g, ' ')
-    var availableDate = req.body.availabledate
     var phone = req.body.phone
     var address = req.body.address
     var email = req.body.email
@@ -254,7 +251,7 @@ router.post('/updateUserData', async (req, res, next) => {
     let promiseUpdateUser = () => {
       return new Promise((resolve, reject) => {
         con.query("update userregister " +
-          "set username='" + username + "', availableDate='" + availableDate + "', phone='" + phone + "', address='" + address + "',email='" + email + "', status=" + status + " where accountId='" + accountId + "'",
+          "set username='" + username + "', phone='" + phone + "', address='" + address + "',email='" + email + "', status=" + status + " where accountId='" + accountId + "'",
           function (err, result) {
             if (err) {
               return reject(err)
@@ -267,8 +264,8 @@ router.post('/updateUserData', async (req, res, next) => {
     let processQuery = async () => {
       try {
         for (var i = 0; i < listOfReleaseId.length; i++) await promiseUpdateCardStatus(listOfReleaseId[i].UID, 1)
-        for (var i = 0; i < listOfNewPlate.length; i++) await promiseAddNewCarPlate(listOfNewPlate[i].carNumPlate, accountId, listOfNewPlate[i].UID, listOfNewPlate[i].status)
-        for (var i = 0; i < listOfPlate.length; i++) await promiseUpdateCarPlate(listOfPlate[i].carNumPlate, listOfPlate[i].UID, listOfPlate[i].status, listOfPlate[i].id)
+        for (var i = 0; i < listOfNewPlate.length; i++) await promiseAddNewCarPlate(listOfNewPlate[i].carNumPlate, accountId, listOfNewPlate[i].UID, listOfNewPlate[i].availableDate, listOfNewPlate[i].status)
+        for (var i = 0; i < listOfPlate.length; i++) await promiseUpdateCarPlate(listOfPlate[i].carNumPlate, listOfPlate[i].UID, listOfPlate[i].availableDate, listOfPlate[i].status, listOfPlate[i].id)
         await promiseUpdateUser()
         await promiseCommit(res)
       } catch (e) {
@@ -313,10 +310,10 @@ router.post('/addUserData', async (req, res, next) => {
   })
 })
 
-let promiseAddNewCarPlate = (carNumPlate, accountId, UID, status) => {
+let promiseAddNewCarPlate = (carNumPlate, accountId, UID, availableDate, status) => {
   return new Promise((resolve, reject) => {
-    con.query("insert into carplate (carNumPlate,accountId,UID,status) values " +
-      "('" + carNumPlate + "','" + accountId + "','" + UID + "'," + status + ")",
+    con.query("insert into carplate (carNumPlate,accountId,UID,availableDate,status) values " +
+      "('" + carNumPlate + "','" + accountId + "','" + UID + "','" + availableDate + "'," + status + ")",
       function (err, result) {
         if (err) {
           return reject(err)
@@ -326,10 +323,10 @@ let promiseAddNewCarPlate = (carNumPlate, accountId, UID, status) => {
     promiseUpdateCardStatus(UID, status)
   })
 }
-let promiseUpdateCarPlate = (carNumPlate, UID, status, id) => {
+let promiseUpdateCarPlate = (carNumPlate, UID, availableDate, status, id) => {
   return new Promise((resolve, reject) => {
     con.query("update carplate set " +
-      "carNumPlate='" + carNumPlate + "', UID='" + UID + "', status=" + status + " where id=" + id,
+      "carNumPlate='" + carNumPlate + "', UID='" + UID + "', availableDate='" + availableDate + "', status=" + status + " where id=" + id,
       function (err, result) {
         if (err) {
           return reject(err)
