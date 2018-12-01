@@ -156,7 +156,8 @@ class NewParkModal extends Component {
     onRemoveModal = (event) => {
         this.setState({
             modalClick: false,
-            errorModalClick: false
+            errorModalClick: false,
+            successModalClick: false
         })
     }
 
@@ -233,8 +234,8 @@ class NewParkModal extends Component {
                 <Modal isOpen={this.state.successModalClick} toggle={this.onRemoveModal} className='modal-success' >
                     <ModalHeader toggle={this.onRemoveModal}>Add Status</ModalHeader>
                     <ModalBody>
-                        Add successfully! Move to Staff Page
-                            </ModalBody>
+                        Add successfully!
+                    </ModalBody>
                     <ModalFooter>
                         <Button color="primary" onClick={this.onRemoveModal}>Close</Button>
                     </ModalFooter>

@@ -194,7 +194,7 @@ class ParkLocation extends Component {
                         name={value.parkname}
                         availableSlot={value.numofavailableslot}
                         label={value.numofavailableslot.toString()}
-                        numOfNotparkCar={value.numofnotparkcar}
+                        numOfCar={value.numofcar}
                         position={{ lat: value.lat, lng: value.lng }} />
                 ))
             )
@@ -233,7 +233,7 @@ class ParkLocation extends Component {
                             <h2>Incoming</h2>
                         </td>
                         <td style={{ padding: '15px' }}>
-                            <h2>{this.state.selectedPlace.numOfNotparkCar}</h2>
+                            <h2>{this.state.selectedPlace.numOfCar}</h2>
                         </td>
                     </tr>
                 </tbody>

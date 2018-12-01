@@ -471,7 +471,7 @@ router.get('/getParkData', function (req, res, next) {
         lng: results[i].lng,
         numofslot: results[i].numOfSlot,
         numofavailableslot: results[i].numOfAvailableSlot,
-        numofnotparkcar: results[i].numOfNotParkCar,
+        numofcar: results[i].numOfCar,
         status: results[i].status
       }
       result.push(userObj)
@@ -492,7 +492,7 @@ router.get('/getParkDataByPark/:parkId', function (req, res, next) {
       lng: results[0].lng,
       numofslot: results[0].numOfSlot,
       numofavailableslot: results[0].numOfAvailableSlot,
-      numofnotparkcar: results[0].numOfNotParkCar,
+      numofcar: results[0].numOfCar,
       status: results[0].status
     }
     res.json(result)
