@@ -587,4 +587,69 @@ let promiseRemovePark = (parkId) => {
   })
 }
 
+router.post('/login', async (req, res, next) => {
+  const { username, password } = req.body;
+  con.query("select s.accountId,s.fullname,s.phone,s.address,s.email,s.status,a.role from staff s join account a on s.accountId=a.accountId where a.accountId='" + username + "' and a.password='" + password + "' and s.status=1", function (err, results) {
+    if (err) throw err
+    if (results.length == 0) res.status(404).send({ success: 0, message: "account Not found" })
+    if (results.length > 0) {
+      req.session.user = { username: results[0].accountId, role: results[0].role, fullname: results[0].fullname };
+      res.send({ success: 1, message: "Logged in!", results })
+    }
+  })
+})
+
+router.post('/changepassword', async (req, res, next) => {
+  const { newpassword ,repeat} = req.body;
+  if(newpassword != repeat){
+    res.status(422).send({ success: 0, message: "Not true" })
+  }
+  con.query("UPDATE account SET password = '" + newpassword + "' WHERE accountId='" + req.session.user.username + "'", function (err, results) {
+    console.log(results.message);
+    if (err) throw err
+    if (results.changedRows == 0) res.status(404).send({ success: 0, message: "failed" })
+    if (results.changedRows > 0) {
+      res.send({ success: 1, message: "Change Success!"})
+    }
+  })
+})
+
+router.post('/checkoldpass', async (req, res, next) => {
+  const { oldpassword } = req.body;
+  con.query("select * from account s where s.accountId='" + req.session.user.username + "'", function (err, results) {
+    if (err) throw err
+    if (results[0].password === oldpassword) {
+      res.send({ success: 1, message: " Success!"})
+    }
+    else{
+      res.status(422).send({ success: 0, message: "Not true" })
+    }
+  })
+})
+
+
+
+router.get('/login/check', (req, res) => {
+  console.log(req.session.user.username)
+  if (req.session.user) res.send({ success: 1, message: "success", user: req.session.user });
+  else res.send({ success: 0, message: "failed" })
+})
+
+router.get("/logout", (req, res) => {
+  req.session.destroy((err) =>{
+      if(err) res.status(500).send({success:0 ,err })
+      else res.send({success: 1, message:"logged out!"})
+  })
+})
+
+router.get('/fullname/:accountId', function (req, res, next) {
+  var accountId = req.params['accountId']
+  con.query("select s.accountId,s.fullname,s.phone,s.address,s.email,s.status,a.role from staff s join account a on s.accountId=a.accountId where s.accountId='" + accountId + "';", function (err, results) {
+    if (err) res.send(err)
+    else res.send({success: 1, message:"logged out!", results})
+  })
+})
+
+
+
 module.exports = router;

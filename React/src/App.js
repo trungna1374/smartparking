@@ -1,6 +1,10 @@
 import React, { Component } from 'react';
 import { HashRouter, Route, Switch } from 'react-router-dom';
+import axios from 'axios';
 import './App.css';
+import Login from './views/Pages/Login/Login.js';
+
+
 // Styles
 // CoreUI Icons Set
 import '@coreui/icons/css/coreui-icons.min.css';
@@ -16,20 +20,56 @@ import './scss/style.css'
 // Containers
 import { DefaultLayout } from './containers';
 // Pages
-import { Login, Page404, Page500, Register } from './views/Pages';
+import { Page404, Page500, Register } from './views/Pages';
 
 // import { renderRoutes } from 'react-router-config';
 
 class App extends Component {
+
+  constructor(props) {
+    super(props);
+    this.state = {
+      username: '',
+    }
+  }
+
+  componentDidMount() {
+    axios
+    .get("/login/check").then(res => {
+      if (res.data.user) {
+        this.setState({
+          username: res.data.user.username
+        })
+      }
+    })
+  }
+
+  onLogin = (user) => {
+    this.setState(user)
+  }
+
+
   render() {
     return (
       <HashRouter>
         <Switch>
-          <Route exact path="/login" name="Login Page" component={Login} />
+          <Route path='/login' render={(props) => {
+            return <Login
+            user = {this.state.username}
+              {...props}
+            />
+          }} />
           <Route exact path="/register" name="Register Page" component={Register} />
           <Route exact path="/404" name="Page 404" component={Page404} />
           <Route exact path="/500" name="Page 500" component={Page500} />
-          <Route path="/" name="Home" component={DefaultLayout} />
+          
+          <Route path='/' render={(props) => {
+            return <DefaultLayout
+            username={this.state.username}
+           
+              {...props}
+            />
+          }} />
         </Switch>
       </HashRouter>
     );

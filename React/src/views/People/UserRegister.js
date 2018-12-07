@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import SearchFiled from './SearchFiled'
 import {
     Badge, Button,
     Table, Row,
@@ -85,6 +86,8 @@ class UserRegister extends Component {
             successModalClick: false
         })
     }
+
+    _onSearchChanged = text => this.setState({ searchString: text });
 
     printUserData = () => {
         if (this.state.data != null) {
@@ -192,6 +195,7 @@ class UserRegister extends Component {
                     <CardBody>
                         <Row>
                             <Button color="primary" href="#/userregister/useradd" style={{ marginBottom: '1rem' }}>Add New User</Button>
+                            <SearchFiled  onSearchChanged={this._onSearchChanged}/>
                         </Row>
                         <Row>
                             {this.printUserData()}
