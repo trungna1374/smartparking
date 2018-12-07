@@ -31,7 +31,8 @@ class ParkLocation extends Component {
             lat: 0,
             lng: 0,
             removeModalClick: false,
-            addParkModal: false
+            addParkModal: false,
+            role: ""
         }
     }
 
@@ -41,7 +42,16 @@ class ParkLocation extends Component {
         this.socket.on("getPark", res => {
             if (JSON.stringify(this.state.data) !== JSON.stringify(res)) this.setState({ data: res })
         })
-        this.socket.emit('subscribeToGetPark', 1000); 
+        this.socket.emit('subscribeToGetPark', 1000);
+
+        axios.get("/login/check").then(res => {
+            if (res.data.user) {
+                this.setState({
+                    role: res.data.user.role,
+                })
+            }
+        })
+
     }
 
     componentWillUnmount() {
@@ -141,7 +151,6 @@ class ParkLocation extends Component {
     removePark = (e) => {
         var obj = { parkid: this.state.selectedPlace.id }
         removePark(obj).then((response) => {
-            console.log(response)
             this.setState({
                 activeMarker: null,
                 selectedPlace: null,
@@ -251,7 +260,7 @@ class ParkLocation extends Component {
             <div className="animated fadeIn">
                 <Card>
                     <CardHeader>
-                        <strong>Staff Management</strong>
+                        <strong>Map</strong>
                     </CardHeader>
 
                     <CardBody>
@@ -277,11 +286,13 @@ class ParkLocation extends Component {
                                 </Map>
                             </div>
                         </ContextMenuTrigger>
-                        <ContextMenu id="mapContext">
-                            <MenuItem data={{ foo: 'bar' }} onClick={this.onAddMarkerClick}>
-                                Add Marker
+                        {this.state.role === "admin" ? (
+                            <ContextMenu id="mapContext">
+                                <MenuItem data={{ foo: 'bar' }} onClick={this.onAddMarkerClick}>
+                                    Add Marker
                             </MenuItem>
-                        </ContextMenu>
+                            </ContextMenu>
+                        ) : ("")}
                         <NewParkModal
                             modal={this.state.addParkModal}
                             activeMarker={this.state.activeMarker}

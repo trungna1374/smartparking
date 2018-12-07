@@ -36,7 +36,7 @@ class UpdateProfileOwner extends Component {
         }
     }
 
-    getStaffDetailData = () => axios.get("/getDetailStaff/baopn")
+    getStaffDetailData = () => axios.get("/getDetailStaff/"+ this.props.match.params.id)
         .then((res) => res.data)
     componentWillMount() {
         if (this.state.staffDetails == null) {
@@ -147,7 +147,7 @@ class UpdateProfileOwner extends Component {
     }
 
     onSuccess = (event) => {
-        this.props.history.push("/staff");
+        window.location.reload();
     }
 
     printData = () => {
@@ -212,7 +212,7 @@ class UpdateProfileOwner extends Component {
                                         <Col xs="12" md="9">
                                             <Input disabled type="select" name="role" id="role" onChange={this.onChangeInput} defaultValue={this.state.role}>
                                                 <option value="admin">Administrator</option>
-                                                <option value="staff">Officer</option>
+                                                <option value="officer">Officer</option>
                                                 <option value="security">Security</option>
                                             </Input>
                                         </Col>
@@ -222,7 +222,7 @@ class UpdateProfileOwner extends Component {
                                             <Label>Status</Label>
                                         </Col>
                                         <Col md="9">
-                                            <AppSwitch size="lg" name={"status"} className={'mx-1'} color={'success'} outline={'alt'} onChange={this.onChangeRadioInput} checked={this.state.staffDetails.status === 1} label />
+                                            <AppSwitch size="lg" name={"status"} className={'mx-1'} color={'success'} outline={'alt'} onChange={this.onChangeRadioInput} checked={this.state.staffDetails.status === 1} label disabled/>
                                         </Col>
                                     </FormGroup>
                                 </Form>
@@ -255,7 +255,7 @@ class UpdateProfileOwner extends Component {
                         <Modal isOpen={this.state.updateSuccessModalClick} toggle={this.onSuccess} className='modal-success' >
                             <ModalHeader toggle={this.onSuccess}>Update Status</ModalHeader>
                             <ModalBody>
-                                Update successfully! Move to Staff Page
+                                Update successfully!
                             </ModalBody>
                             <ModalFooter>
                                 <Button color="primary" onClick={this.onSuccess}>Close</Button>

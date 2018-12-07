@@ -101,16 +101,16 @@ class NewParkModal extends Component {
             readyForSubmit = false
         }
         if (this.state.numOfSlot.trim() === '') {
-            checkNumOfSlot = "Email couldn't  be empty"
+            checkNumOfSlot = "Number Of Slot couldn't  be empty"
             readyForSubmit = false
         }
         if (this.state.numOfAvailableSlot.trim() === '') {
-            checkNumOfAvailableSlot = "Email couldn't  be empty"
+            checkNumOfAvailableSlot = "Number Of Available Slot couldn't  be empty"
             readyForSubmit = false
         }
 
         if (this.state.numOfAvailableSlot.trim() !== '' && this.state.numOfSlot.trim() !== '') {
-            if (parseInt(this.state.numOfAvailableSlot) > parseInt(this.state.numOfSlot)) {
+            if (parseInt(this.state.numOfAvailableSlot, 10) > parseInt(this.state.numOfSlot, 10)) {
                 checkNumOfAvailableSlot = "Number of Available Slots couldn't  be greater than number of Slots"
                 readyForSubmit = false
             }

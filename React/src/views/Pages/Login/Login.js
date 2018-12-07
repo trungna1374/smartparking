@@ -41,7 +41,6 @@ class Login extends Component {
   }
 
   render() {
-    console.log(this.state)
 
     const display = this.props.user ? ( 
       window.location.href = "/"
@@ -87,10 +86,9 @@ class Login extends Component {
                 <Card className="text-white bg-primary py-5 d-md-down-none" style={{ width: 44 + '%' }}>
                   <CardBody className="text-center">
                     <div>
-                      <h2>Sign up</h2>
-                      <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut
-                        labore et dolore magna aliqua.</p>
-                      <Button color="primary" className="mt-3" active>Register Now!</Button>
+                      <h2>Smart Parking</h2>
+                      <p></p>
+                      <Button color="primary" className="mt-3" href="\" active>Back to Map</Button>
                     </div>
                   </CardBody>
                 </Card>

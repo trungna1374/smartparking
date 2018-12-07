@@ -1,9 +1,9 @@
 import React, { Component } from 'react';
-import { Badge, DropdownItem, DropdownMenu, DropdownToggle, Nav, NavItem, NavLink, Button } from 'reactstrap';
+import { Badge, DropdownItem, DropdownMenu, DropdownToggle, Nav, NavItem, NavLink } from 'reactstrap';
 import PropTypes from 'prop-types';
 import axios from 'axios'
 
-import { AppAsideToggler, AppHeaderDropdown, AppNavbarBrand, AppSidebarToggler } from '@coreui/react';
+import {  AppHeaderDropdown, AppNavbarBrand, AppSidebarToggler } from '@coreui/react';
 
 const propTypes = {
   children: PropTypes.node,
@@ -13,7 +13,7 @@ const defaultProps = {};
 
 class DefaultHeader extends Component {
   state = {
-    username: "baopn",
+    username: "",
     fullname: ""
   }
 
@@ -27,7 +27,6 @@ class DefaultHeader extends Component {
 
 
   render() {
-    console.log(this.props.username.username)
     // eslint-disable-next-line
     const { children, ...attributes } = this.props;
 
@@ -35,8 +34,8 @@ class DefaultHeader extends Component {
       <React.Fragment>
         <AppSidebarToggler className="d-lg-none" display="md" mobile />
         <AppNavbarBrand
-          full={{ src: '', width: 89, height: 25, alt: 'Smart Parking' }}
-          minimized={{ src: '', width: 30, height: 30, alt: 'S' }}
+          full={{ src: 'smartparkingfull.png', width: 100, height: 30, alt: 'Smart Parking' }}
+          minimized={{ src: 'smartparking.png', width: 30, height: 30, alt: 'S' }}
         />
         <AppSidebarToggler className="d-md-down-none" display="lg" />
 
@@ -45,10 +44,7 @@ class DefaultHeader extends Component {
             <NavLink href="/">Dashboard</NavLink>
           </NavItem>
           <NavItem className="px-3">
-            <NavLink href="#/users">Users</NavLink>
-          </NavItem>
-          <NavItem className="px-3">
-            <NavLink href="#">Settings</NavLink>
+            <NavLink href="#/userregister">Users</NavLink>
           </NavItem>
         </Nav>
         <Nav className="ml-auto" navbar>
@@ -62,14 +58,14 @@ class DefaultHeader extends Component {
             <NavLink href="#"><i className="icon-location-pin"></i></NavLink>
           </NavItem> */}
           <AppHeaderDropdown direction="down">
-            <DropdownToggle nav inline>
+            <DropdownToggle nav>
               <div className="name-header">
-                <h4 >Hello, {this.props.username.fullname}</h4>
+                <h5>Hello, {this.props.username.fullname}</h5>
               </div>
             </DropdownToggle>
             <DropdownMenu right style={{ right: 'auto' }}>
               <DropdownItem header tag="div" className="text-center"><strong>Account</strong></DropdownItem>
-              <DropdownItem href="#/updateprofile"><i className="fa fa-bell-o"></i> Updates Profile<Badge color="info"></Badge></DropdownItem>
+              <DropdownItem href={"#/updateprofile/" +this.props.username.username}><i className="fa fa-bell-o"></i> Updates Profile<Badge color="info"></Badge></DropdownItem>
               <DropdownItem href="#/updatepassword"><i className="fa fa-bell-o"></i> Change Password<Badge color="info"></Badge></DropdownItem>
               <DropdownItem divider />
               <DropdownItem onClick={this._handleLogOut} href='/'><i className="fa fa-lock"></i> Logout</DropdownItem>
@@ -83,8 +79,8 @@ class DefaultHeader extends Component {
         <React.Fragment>
         <AppSidebarToggler className="d-lg-none" display="md" mobile />
         <AppNavbarBrand
-          full={{ src: '', width: 89, height: 25, alt: 'Smart Parking' }}
-          minimized={{ src: '', width: 30, height: 30, alt: 'S' }}
+          full={{ src: 'smartparkingfull.png', width: 100, height: 30, alt: 'Smart Parking' }}
+          minimized={{ src: 'smartparking.png', width: 30, height: 30, alt: 'S' }}
         />
         <AppSidebarToggler className="d-md-down-none" display="lg" />
 

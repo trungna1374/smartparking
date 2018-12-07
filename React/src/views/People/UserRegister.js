@@ -5,7 +5,6 @@ import {
     Table, Row,
     Card, CardBody, CardHeader,
     Modal, ModalBody, ModalFooter, ModalHeader,
-    Pagination, PaginationItem, PaginationLink
 } from 'reactstrap';
 import axios from "axios";
 // import Pagination from "react-js-pagination";

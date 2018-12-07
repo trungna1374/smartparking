@@ -12,7 +12,7 @@ import validator from 'validator';
 
 
 const updateUserData = (userUpdateData) => {
-    return axios.post('/updateUserData', userUpdateData).then((res) => res.data)
+    return axios.post('/updateUserOwnData', userUpdateData).then((res) => res.data)
 }
 
 class UserUpdate extends Component {
@@ -70,121 +70,10 @@ class UserUpdate extends Component {
         }
     }
 
-    handleAddPlateInput = () => {
-        this.setState({
-            inputClicked: this.state.inputClicked + 1
-        })
-        this.setState({
-            listOfNewPlate: this.state.listOfNewPlate.concat({
-                carNumPlate: "",
-                UID: this.state.userDetails.listOfRfid[0].value,
-                availableDate: "",
-                status: 0
-            })
-        })
-    }
-
-    createPlateInput = () => {
-        var input = []
-        if (this.state.userDetails != null)
-            for (let index = 0; index < this.state.inputClicked; index++) {
-                input.push(<FormGroup row key={index}>
-                    <Col xs="12" md="3"  >
-                        <Input type="text" id={"newPlate" + index} name={"newPlate" + index} onChange={this.onChangePlateNumberInput} style={{ textAlign: "center" }} placeholder="Enter Plate Number" required />
-                    </Col>
-                    <Col xs="12" md="4" >
-                        <Input type="select" name={"newRfid" + index} id={"newRfid" + index} onChange={this.onChangeRFIDInput} placeholder="Choose RFID" required>
-                            {this.state.userDetails.listOfRfid.map((value1, key1) => (
-                                <option key={key1} value={value1.value}>{value1.value}</option>
-                            ))}
-                        </Input>
-                    </Col>
-                    <Col xs="12" md="3">
-                        <Input type="date" id={"newAvailabledate" + index} name={"newAvailabledate" + index} invalid={this.state.checkAvailableDate !== "ok"} onChange={this.onChangeAvailableDateInput} placeholder="date" required />
-                        <FormFeedback>{this.state.checkAvailableDate}</FormFeedback>
-                    </Col>
-                    <Col>
-                        <AppSwitch size="lg" name={"newStatusPlate" + index} className={'mx-1'} color={'success'} outline={'alt'} onChange={this.onChangePlateRadioInput} label />
-                    </Col>
-                </FormGroup>)
-            }
-        return input;
-    }
-
     onChangeInput = (event) => {
         this.setState({
             [event.target.name]: event.target.value
         })
-    }
-
-    onChangeRadioInput = (event) => {
-        this.setState({
-            [event.target.name]: event.target.checked ? 1 : 0
-        })
-    }
-
-    onChangePlateNumberInput = (event) => {
-        if (event.target.name.includes("newPlate")) {
-            var listPlate = this.state.listOfNewPlate
-            listPlate[event.target.name.substring(8)].carNumPlate = event.target.value
-            this.setState({
-                listOfNewPlate: listPlate
-            })
-        } else {
-            var listPlate = this.state.listOfPlate
-            listPlate[event.target.name.substring(5)].carNumPlate = event.target.value
-            this.setState({
-                listOfPlate: listPlate
-            })
-        }
-    }
-
-    onChangeRFIDInput = (event) => {
-        if (event.target.name.includes("newRfid")) {
-            var listPlate = this.state.listOfNewPlate
-            listPlate[event.target.name.substring(7)].UID = event.target.value
-            this.setState({
-                listOfNewPlate: listPlate
-            })
-        } else {
-            var listPlate = this.state.listOfPlate
-            listPlate[event.target.name.substring(4)].UID = event.target.value
-            this.setState({
-                listOfPlate: listPlate
-            })
-        }
-    }
-
-    onChangeAvailableDateInput = (event) => {
-        if (event.target.name.includes("newAvailabledate")) {
-            var listPlate = this.state.listOfNewPlate
-            listPlate[event.target.name.substring(16)].availableDate = event.target.value
-            this.setState({
-                listOfNewPlate: listPlate
-            })
-        } else {
-            var listPlate = this.state.listOfPlate
-            listPlate[event.target.name.substring(13)].availableDate = event.target.value
-            this.setState({
-                listOfPlate: listPlate
-            })
-        }
-    }
-
-    onChangePlateRadioInput = (event) => {
-        if (event.target.name.includes("newStatusPlate")) {
-            var listPlate = this.state.listOfNewPlate
-            listPlate[event.target.name.substring(14)].status = event.target.checked ? 1 : 0
-            this.setState({
-                listOfNewPlate: listPlate
-            })
-        } else {
-            var listPlate = this.state.listOfPlate
-            listPlate[event.target.name.substring(11)].status = event.target.checked ? 1 : 0
-            this.setState({
-                listOfPlate: listPlate
-            })
-        }
     }
 
     refreshPage() {
@@ -193,16 +82,10 @@ class UserUpdate extends Component {
 
     onUpdateClick = (event) => {
         event.preventDefault()
-        var checkFullname = "ok"
         var checkPhone = "ok"
         var checkAddress = "ok"
         var checkEmail = "ok"
-        var checkAvailableDate = "ok"
         var readyForSubmit = true
-        if (this.state.username.trim() === '') {
-            checkFullname = "Fullname couldn't  be empty"
-            readyForSubmit = false
-        }
         if (this.state.phone.trim() === '') {
             checkPhone = "Phone couldn't  be empty"
             readyForSubmit = false
@@ -225,11 +108,9 @@ class UserUpdate extends Component {
         // }
 
         this.setState({
-            checkFullname: checkFullname,
             checkPhone: checkPhone,
             checkAddress: checkAddress,
             checkEmail: checkEmail,
-            checkAvailableDate: checkAvailableDate
         })
 
         if (readyForSubmit) {
@@ -240,27 +121,12 @@ class UserUpdate extends Component {
     }
 
     onUpdateData = (event) => {
-        var listOfReleaseRFID = []
-        for (var i = 0; i < this.state.userDetails.listOfPlate.length; i++) {
-            if (this.state.userDetails.listOfPlate[i].UID != this.state.listOfPlate[i].UID) {
-                listOfReleaseRFID.push({
-                    UID: this.state.userDetails.listOfPlate[i].UID
-                })
-            }
-        }
         var obj = {
             accountId: this.state.accountId,
-            username: this.state.username,
             phone: this.state.phone,
             address: this.state.address,
             email: this.state.email,
-            status: this.state.status,
-            listofplate: this.state.listOfPlate,
-            listofnewplate: this.state.listOfNewPlate,
-            listofreleaserfid: listOfReleaseRFID
         }
-
-        console.log(obj)
 
         updateUserData(obj).then((response) => {
             if (JSON.stringify(response) === JSON.stringify('success')) {
@@ -283,8 +149,10 @@ class UserUpdate extends Component {
     }
 
     onSuccess = (event) => {
-        this.props.history.push("/userregister");
+        window.location.reload();
     }
+
+
 
     printData = () => {
         if (this.state.userDetails != null)
@@ -310,7 +178,7 @@ class UserUpdate extends Component {
                                             <Label htmlFor="text-input">Username</Label>
                                         </Col>
                                         <Col xs="12" md="9">
-                                            <Input type="text" id="username" name="username" invalid={this.state.checkFullname !== "ok"} onChange={this.onChangeInput} placeholder="Please enter fullname of user" defaultValue={this.state.userDetails.username} required />
+                                            <Input type="text" id="username" name="username" invalid={this.state.checkFullname !== "ok"} onChange={this.onChangeInput} placeholder="Please enter fullname of user" defaultValue={this.state.userDetails.username} required disabled />
                                             <FormFeedback>{this.state.checkFullname}</FormFeedback>
                                         </Col>
                                     </FormGroup>
@@ -346,22 +214,23 @@ class UserUpdate extends Component {
                                             <Label>Status</Label>
                                         </Col>
                                         <Col md="9">
-                                            <AppSwitch size="lg" name={"status"} className={'mx-1'} color={'success'} outline={'alt'} onChange={this.onChangeRadioInput} checked={this.state.userDetails.status === 1} label />
+                                            <AppSwitch size="lg" name={"status"} className={'mx-1'} color={'success'} outline={'alt'} onChange={this.onChangeRadioInput} checked={this.state.userDetails.status === 1} label disabled />
                                         </Col>
                                     </FormGroup>
-                                    <FormGroup row>
-                                        <Col md="3">
-                                            <Label htmlFor="text-input">List of Plates</Label>
-                                        </Col>
-                                    </FormGroup>
+                                    {this.state.userDetails.listOfPlate.length !== 0 ? (
+                                        <FormGroup row>
+                                            <Col md="3">
+                                                <Label htmlFor="text-input">List of Plates</Label>
+                                            </Col>
+                                        </FormGroup>) : ("")}
                                     {
                                         this.state.userDetails.listOfPlate.map((value, key) => (
                                             <FormGroup row key={key}>
                                                 <Col xs="12" md="3"  >
-                                                    <Input type="text" id={"plate" + key} name={"plate" + key} onChange={this.onChangePlateNumberInput} style={{ textAlign: "center" }} defaultValue={value.carNumPlate} required />
+                                                    <Input type="text" id={"plate" + key} name={"plate" + key} onChange={this.onChangePlateNumberInput} style={{ textAlign: "center" }} defaultValue={value.carNumPlate} required disabled />
                                                 </Col>
                                                 <Col xs="12" md="4" >
-                                                    <Input type="select" name={"rfid" + key} id={"rfid" + key} onChange={this.onChangeRFIDInput} defaultValue={value.UID} required>
+                                                    <Input type="select" name={"rfid" + key} id={"rfid" + key} onChange={this.onChangeRFIDInput} defaultValue={value.UID} required disabled>
                                                         <option value={value.UID}>{value.UID}</option>
                                                         {this.state.userDetails.listOfRfid.map((value1, key1) => (
                                                             <option key={key1} value={value1.value}>{value1.value}</option>
@@ -369,22 +238,13 @@ class UserUpdate extends Component {
                                                     </Input>
                                                 </Col>
                                                 <Col xs="12" md="3">
-                                                    <Input type="date" id={"availabledate" + key} name={"availabledate" + key} invalid={this.state.checkAvailableDate !== "ok"} onChange={this.onChangeAvailableDateInput} defaultValue={value.availableDate} placeholder="date" required />
-                                                    <FormFeedback>{this.state.checkAvailableDate}</FormFeedback>
+                                                    <Input type="date" id={"availabledate" + key} name={"availabledate" + key} onChange={this.onChangeAvailableDateInput} defaultValue={value.availableDate} placeholder="date" required disabled />
                                                 </Col>
                                                 <Col>
-                                                    <AppSwitch size="lg" name={"statusPlate" + key} className={'mx-1'} color={'success'} outline={'alt'} onChange={this.onChangePlateRadioInput} checked={value.status === 1} label required />
+                                                    <AppSwitch size="lg" name={"statusPlate" + key} className={'mx-1'} color={'success'} outline={'alt'} onChange={this.onChangePlateRadioInput} checked={value.status === 1} label required disabled />
                                                 </Col>
                                             </FormGroup>
                                         ))}
-                                    {
-                                        this.createPlateInput()
-                                    }
-                                    <FormGroup row>
-                                        <Col>
-                                            <Button onClick={this.handleAddPlateInput}>Add New</Button>
-                                        </Col>
-                                    </FormGroup>
                                 </Form>
                             </CardBody>
                             <CardFooter>
@@ -415,7 +275,7 @@ class UserUpdate extends Component {
                         <Modal isOpen={this.state.successModalClick} toggle={this.onSuccess} className='modal-success' >
                             <ModalHeader toggle={this.onSuccess}>Update Status</ModalHeader>
                             <ModalBody>
-                                Update successfully! Move to User Register Page
+                                Update successfully!
                             </ModalBody>
                             <ModalFooter>
                                 <Button color="primary" onClick={this.onSuccess}>Close</Button>

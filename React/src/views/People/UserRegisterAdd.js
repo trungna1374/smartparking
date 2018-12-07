@@ -23,7 +23,6 @@ class UserRegisterAdd extends Component {
             phone: "",
             address: "",
             email: "",
-            availabledate: "",
             status: 0,
             listOfAvailableRFID: [],
             listOfNewPlate: [],
@@ -31,7 +30,6 @@ class UserRegisterAdd extends Component {
             checkPhone: "ok",
             checkAddress: "ok",
             checkEmail: "ok",
-            checkAvailableDate: "ok",
             modalClick: false,
             errorModalClick: false,
             successModalClick: false
@@ -58,6 +56,7 @@ class UserRegisterAdd extends Component {
             listOfNewPlate: this.state.listOfNewPlate.concat({
                 carNumPlate: "",
                 UID: this.state.listOfAvailableRFID[0].UID,
+                availableDate: "",
                 status: 0
             })
         })
@@ -71,12 +70,16 @@ class UserRegisterAdd extends Component {
                     <Col xs="12" md="3"  >
                         <Input type="text" id={"newPlate" + index} name={"newPlate" + index} onChange={this.onChangePlateNumberInput} style={{ textAlign: "center" }} placeholder="Enter Plate Number" required />
                     </Col>
-                    <Col xs="12" md="5" >
+                    <Col xs="12" md="4" >
                         <Input type="select" name={"newRfid" + index} id={"newRfid" + index} onChange={this.onChangeRFIDInput} placeholder="Choose RFID" required>
                             {this.state.listOfAvailableRFID.map((value1, key1) => (
                                 <option key={key1} value={value1.UID}>{value1.UID}</option>
                             ))}
                         </Input>
+                    </Col>
+                    <Col xs="12" md="3">
+                        <Input type="date" id={"newAvailabledate" + index} name={"newAvailabledate" + index} onChange={this.onChangeAvailableDateInput} placeholder="date" required />
+                        <FormFeedback>{this.state.checkAvailableDate}</FormFeedback>
                     </Col>
                     <Col>
                         <AppSwitch size="lg" name={"newStatusPlate" + index} className={'mx-1'} color={'success'} outline={'alt'} onChange={this.onChangePlateRadioInput} label />
@@ -118,6 +121,22 @@ class UserRegisterAdd extends Component {
         }
     }
 
+    onChangeAvailableDateInput = (event) => {
+        if (event.target.name.includes("newAvailabledate")) {
+            var listPlate = this.state.listOfNewPlate
+            listPlate[event.target.name.substring(16)].availableDate = event.target.value
+            this.setState({
+                listOfNewPlate: listPlate
+            })
+        } else {
+            listPlate = this.state.listOfPlate
+            listPlate[event.target.name.substring(13)].availableDate = event.target.value
+            this.setState({
+                listOfPlate: listPlate
+            })
+        }
+    }
+
     onChangePlateRadioInput = (event) => {
         if (event.target.name.includes("newStatusPlate")) {
             var listPlate = this.state.listOfNewPlate
@@ -138,7 +157,6 @@ class UserRegisterAdd extends Component {
         var checkPhone = "ok"
         var checkAddress = "ok"
         var checkEmail = "ok"
-        var checkAvailableDate = "ok"
         var readyForSubmit = true
         if (this.state.username.trim() === '') {
             checkFullname = "Fullname couldn't  be empty"
@@ -160,17 +178,12 @@ class UserRegisterAdd extends Component {
                 checkEmail = "'" + this.state.email + "' is not a valid email"
                 readyForSubmit = false
             }
-        if (this.state.availabledate.trim() === '') {
-            checkAvailableDate = "Choose available Date"
-            readyForSubmit = false
-        }
 
         this.setState({
             checkFullname: checkFullname,
             checkPhone: checkPhone,
             checkAddress: checkAddress,
             checkEmail: checkEmail,
-            checkAvailableDate: checkAvailableDate
         })
 
         if (readyForSubmit) {
@@ -186,7 +199,6 @@ class UserRegisterAdd extends Component {
             phone: this.state.phone,
             address: this.state.address,
             email: this.state.email,
-            availabledate: this.state.availabledate,
             status: this.state.status,
             listofnewplate: this.state.listOfNewPlate
         }
@@ -220,7 +232,7 @@ class UserRegisterAdd extends Component {
                 <Col xs="12" md="6">
                     <Card>
                         <CardHeader>
-                            <strong>User Update</strong>
+                            <strong>User Insert</strong>
                         </CardHeader>
                         <CardBody>
                             <Form action="sendUserUpdateForm" method="post" encType="multipart/form-data" className="form-horizontal">
@@ -258,15 +270,6 @@ class UserRegisterAdd extends Component {
                                     <Col xs="12" md="9">
                                         <Input type="text" id="email" name="email" invalid={this.state.checkEmail !== "ok"} onChange={this.onChangeInput} placeholder="Please enter email of user" required />
                                         <FormFeedback>{this.state.checkEmail}</FormFeedback>
-                                    </Col>
-                                </FormGroup>
-                                <FormGroup row>
-                                    <Col md="3">
-                                        <Label htmlFor="date-input">Available Date</Label>
-                                    </Col>
-                                    <Col xs="12" md="9">
-                                        <Input type="date" id="availabledate" name="availabledate" invalid={this.state.checkAvailableDate !== "ok"} onChange={this.onChangeInput} placeholder="date" required />
-                                        <FormFeedback>{this.state.checkAvailableDate}</FormFeedback>
                                     </Col>
                                 </FormGroup>
                                 <FormGroup row>

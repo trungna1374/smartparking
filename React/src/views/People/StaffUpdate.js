@@ -212,7 +212,7 @@ class StaffUpdate extends Component {
                                         <Col xs="12" md="9">
                                             <Input type="select" name="role" id="role" onChange={this.onChangeInput} defaultValue={this.state.role}>
                                                 <option value="admin">Administrator</option>
-                                                <option value="staff">Officer</option>
+                                                <option value="officer">Officer</option>
                                                 <option value="security">Security</option>
                                             </Input>
                                         </Col>

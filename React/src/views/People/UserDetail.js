@@ -67,6 +67,7 @@ class UserDetail extends Component {
                         <tr>
                             <th>Plate Number</th>
                             <th>RFID</th>
+                            <th>Available Date</th>
                             <th>Status</th>
                         </tr>
                     </thead>
@@ -78,6 +79,9 @@ class UserDetail extends Component {
                                 </td>
                                 <td>
                                     {value.UID}
+                                </td>
+                                <td>
+                                    {value.availableDate}
                                 </td>
                                 <td>
                                     <Badge color={value.status === 1 ? "success" : "danger"}>{value.status === 1 ? "Active" : "Deactive"}</Badge>
@@ -98,9 +102,10 @@ class UserDetail extends Component {
                         <CardBody>
                             {this.printData()}
                         </CardBody>
-                        <CardHeader>
-                            <strong><i className="pr-1"></i>Plate Number - RFID</strong>
-                        </CardHeader>
+                        {this.state.userDetails.listOfPlate.length !== 0 ? (
+                            <CardHeader>
+                                <strong><i className="pr-1"></i>Plate Number - RFID</strong>
+                            </CardHeader>) : ("")}
                         <CardBody>
                             {this.printPlateData()}
                         </CardBody>
@@ -113,7 +118,6 @@ class UserDetail extends Component {
     }
 
     render() {
-        console.log(this.state.userDetails)
         return (
             <div className="animated fadeIn">
                 {this.printAllData()}

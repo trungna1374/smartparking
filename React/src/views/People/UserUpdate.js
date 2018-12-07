@@ -33,7 +33,6 @@ class UserUpdate extends Component {
             checkPhone: "ok",
             checkAddress: "ok",
             checkEmail: "ok",
-            checkAvailableDate: "ok",
             modalClick: false,
             errorModalClick: false,
             successModalClick: false
@@ -100,7 +99,7 @@ class UserUpdate extends Component {
                         </Input>
                     </Col>
                     <Col xs="12" md="3">
-                        <Input type="date" id={"newAvailabledate" + index} name={"newAvailabledate" + index} invalid={this.state.checkAvailableDate !== "ok"} onChange={this.onChangeAvailableDateInput} placeholder="date" required />
+                        <Input type="date" id={"newAvailabledate" + index} name={"newAvailabledate" + index} onChange={this.onChangeAvailableDateInput} placeholder="date" required />
                         <FormFeedback>{this.state.checkAvailableDate}</FormFeedback>
                     </Col>
                     <Col>
@@ -131,7 +130,7 @@ class UserUpdate extends Component {
                 listOfNewPlate: listPlate
             })
         } else {
-            var listPlate = this.state.listOfPlate
+            listPlate = this.state.listOfPlate
             listPlate[event.target.name.substring(5)].carNumPlate = event.target.value
             this.setState({
                 listOfPlate: listPlate
@@ -147,7 +146,7 @@ class UserUpdate extends Component {
                 listOfNewPlate: listPlate
             })
         } else {
-            var listPlate = this.state.listOfPlate
+            listPlate = this.state.listOfPlate
             listPlate[event.target.name.substring(4)].UID = event.target.value
             this.setState({
                 listOfPlate: listPlate
@@ -163,7 +162,7 @@ class UserUpdate extends Component {
                 listOfNewPlate: listPlate
             })
         } else {
-            var listPlate = this.state.listOfPlate
+            listPlate = this.state.listOfPlate
             listPlate[event.target.name.substring(13)].availableDate = event.target.value
             this.setState({
                 listOfPlate: listPlate
@@ -179,7 +178,7 @@ class UserUpdate extends Component {
                 listOfNewPlate: listPlate
             })
         } else {
-            var listPlate = this.state.listOfPlate
+            listPlate = this.state.listOfPlate
             listPlate[event.target.name.substring(11)].status = event.target.checked ? 1 : 0
             this.setState({
                 listOfPlate: listPlate
@@ -197,7 +196,6 @@ class UserUpdate extends Component {
         var checkPhone = "ok"
         var checkAddress = "ok"
         var checkEmail = "ok"
-        var checkAvailableDate = "ok"
         var readyForSubmit = true
         if (this.state.username.trim() === '') {
             checkFullname = "Fullname couldn't  be empty"
@@ -229,7 +227,6 @@ class UserUpdate extends Component {
             checkPhone: checkPhone,
             checkAddress: checkAddress,
             checkEmail: checkEmail,
-            checkAvailableDate: checkAvailableDate
         })
 
         if (readyForSubmit) {
@@ -242,7 +239,7 @@ class UserUpdate extends Component {
     onUpdateData = (event) => {
         var listOfReleaseRFID = []
         for (var i = 0; i < this.state.userDetails.listOfPlate.length; i++) {
-            if (this.state.userDetails.listOfPlate[i].UID != this.state.listOfPlate[i].UID) {
+            if (this.state.userDetails.listOfPlate[i].UID !== this.state.listOfPlate[i].UID) {
                 listOfReleaseRFID.push({
                     UID: this.state.userDetails.listOfPlate[i].UID
                 })
@@ -259,8 +256,6 @@ class UserUpdate extends Component {
             listofnewplate: this.state.listOfNewPlate,
             listofreleaserfid: listOfReleaseRFID
         }
-
-        console.log(obj)
 
         updateUserData(obj).then((response) => {
             if (JSON.stringify(response) === JSON.stringify('success')) {
@@ -369,8 +364,7 @@ class UserUpdate extends Component {
                                                     </Input>
                                                 </Col>
                                                 <Col xs="12" md="3">
-                                                    <Input type="date" id={"availabledate" + key} name={"availabledate" + key} invalid={this.state.checkAvailableDate !== "ok"} onChange={this.onChangeAvailableDateInput} defaultValue={value.availableDate} placeholder="date" required />
-                                                    <FormFeedback>{this.state.checkAvailableDate}</FormFeedback>
+                                                    <Input type="date" id={"availabledate" + key} name={"availabledate" + key} onChange={this.onChangeAvailableDateInput} defaultValue={value.availableDate} placeholder="date" required />
                                                 </Col>
                                                 <Col>
                                                     <AppSwitch size="lg" name={"statusPlate" + key} className={'mx-1'} color={'success'} outline={'alt'} onChange={this.onChangePlateRadioInput} checked={value.status === 1} label required />

@@ -1,29 +1,29 @@
 const guestnav = {
   items: [
     {
-      name:'Map',
-      url:'/map',
-      icon:'icon-map'
+      name: 'Map',
+      url: '/map',
+      icon: 'icon-map'
     },
-  ] 
+  ]
 }
 
 const usernav = {
   items: [
     {
-      name:'Map',
-      url:'/map',
-      icon:'icon-map'
+      name: 'Map',
+      url: '/map',
+      icon: 'icon-map'
     }
-  ] 
+  ]
 }
 
-const staffnav = {
+const officernav = {
   items: [
     {
-      name:'Map',
-      url:'/map',
-      icon:'icon-map'
+      name: 'Map',
+      url: '/map',
+      icon: 'icon-map'
     },
     {
       name: 'People',
@@ -33,24 +33,46 @@ const staffnav = {
         {
           name: 'User Register',
           url: '/userregister',
-          icon: 'icon-bell',
+          icon: 'icon-user',
         }
       ],
     },
+  ]
+}
+
+const securitynav = {
+  items: [
     {
-      name:'Live Stream',
-      url:'/livestream',
-      icon:'icon-map'
+      name: 'Map',
+      url: '/map',
+      icon: 'icon-map'
     },
-  ] 
+    {
+      name: 'Livestream',
+      url: '/livestream',
+      icon: 'cui-monitor',
+      children: [
+        {
+          name: 'Livestream Gate in',
+          url: '/livestream/livestreamin',
+          icon: 'cui-monitor',
+        },
+        {
+          name: 'Livestream Gate out',
+          url: '/livestream/livestreamout',
+          icon: 'cui-monitor',
+        },
+      ],
+    },
+  ]
 }
 
 const adminnav = {
   items: [
     {
-      name:'Map',
-      url:'/map',
-      icon:'icon-map'
+      name: 'Map',
+      url: '/map',
+      icon: 'icon-map'
     },
     {
       name: 'People',
@@ -60,25 +82,38 @@ const adminnav = {
         {
           name: 'User Register',
           url: '/userregister',
-          icon: 'icon-bell',
+          icon: 'icon-user',
         },
         {
           name: 'Staff',
           url: '/staff',
-          icon: 'icon-bell',
+          icon: 'icon-user',
         },
       ],
     },
     {
-      name:'Live Stream',
-      url:'/livestream',
-      icon:'icon-map'
+      name: 'Livestream',
+      url: '/livestream',
+      icon: 'cui-monitor',
+      children: [
+        {
+          name: 'Livestream Gate in',
+          url: '/livestream/livestreamin',
+          icon: 'cui-monitor',
+        },
+        {
+          name: 'Livestream Gate out',
+          url: '/livestream/livestreamout',
+          icon: 'cui-monitor',
+        },
+      ],
     },
-  ] 
+  ]
 }
 
-export  {guestnav}
-export {usernav}
-export {staffnav}
-export {adminnav};
+export { guestnav }
+export { usernav }
+export { officernav }
+export { securitynav }
+export { adminnav }
 

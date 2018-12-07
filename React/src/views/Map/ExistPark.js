@@ -34,7 +34,6 @@ class ExistPark extends Component {
                 ))
             )
         }
-            
     }
     printInfoWindow = () => {
         if (this.state.data != null)

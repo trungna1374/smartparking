@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Button, Card, CardBody, CardFooter, Col, Container, Form, Input, InputGroup, InputGroupAddon, InputGroupText, Row } from 'reactstrap';
+import { Button, Card, CardBody, Col, Form, Input, InputGroup, InputGroupAddon, InputGroupText, Row } from 'reactstrap';
 import axios from 'axios';
 class Register extends Component {
     state = {};
@@ -39,27 +39,25 @@ class Register extends Component {
             .then(response => {
               this.setState({ data: response.data })
               if (response.data.success === 1) {
-                alert("Change Success")
+                alert("Change Password Successfully")
+                window.location.reload();
               }
               else {
-                alert("Not the same")
+                alert("Repeat Password isn't correct")
               }
             }
             )
             .catch(err => console.error(err))
           }
           else {
-            alert("Sai Mat Khau")
+            alert("Password Wrong")
           }
         }
         )
         .catch(err => console.error(err))
-      
     }
 
-
   render() {
-      console.log(this.state)
     
     return (
 

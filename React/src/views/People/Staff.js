@@ -1,12 +1,11 @@
 import React, { Component } from 'react';
 import {
     Row, Badge, Button,
-    Table, Card, CardBody,
-    CardFooter, CardHeader,
+    Table, Card, CardBody, CardHeader,
     Modal, ModalBody, ModalFooter, ModalHeader,
-    Pagination, PaginationItem, PaginationLink
 } from 'reactstrap';
 import axios from "axios";
+import SearchFiled from './SearchFiled'
 // import Pagination from "react-js-pagination";
 
 // require("bootstrap/less/bootstrap.less");
@@ -191,6 +190,7 @@ class Staff extends Component {
                     <CardBody>
                         <Row>
                             <Button color="primary" href="#/staff/staffadd" style={{ marginBottom: '1rem' }}>Add New Staff</Button>
+                            <SearchFiled  onSearchChanged={this._onSearchChanged}/>
                         </Row>
                         <Row>
                             {this.printStaffData()}

@@ -132,7 +132,7 @@ class StaffAdd extends Component {
                 <Col xs="12" md="6">
                     <Card>
                         <CardHeader>
-                            <strong>User Update</strong>
+                            <strong>Staff Insert</strong>
                         </CardHeader>
                         <CardBody>
                             <Form action="sendUserUpdateForm" method="post" encType="multipart/form-data" className="form-horizontal">
@@ -179,7 +179,7 @@ class StaffAdd extends Component {
                                     <Col xs="12" md="9">
                                         <Input type="select" name="role" id="role" onChange={this.onChangeInput}>
                                             <option value="admin">Administrator</option>
-                                            <option value="staff">Officer</option>
+                                            <option value="officer">Officer</option>
                                             <option value="security">Security</option>
                                         </Input>
                                     </Col>

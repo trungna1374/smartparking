@@ -160,7 +160,7 @@ router.post('/addStaffData', async (req, res, next) => {
       try {
         let accountId = await promiseCreateAccountId(username)
         await promiseInsertAccount(accountId, '123456', role)
-        await promiseInsertStaff(accountId, username, phone, address, email, status)
+        await promiseInsertStaff(accountId, req.body.username.trim().replace(/  +/g, ' '), phone, address, email, status)
         await promiseCommit(res)
       } catch (e) {
         console.log(e)
@@ -211,7 +211,7 @@ router.get('/getAllUserRegister', function (req, res, next) {
 
 router.get('/getDetailUser/:accountId', function (req, res, next) {
   var accountId = req.params['accountId']
-  con.query("select *, DATE_FORMAT(createDate,'%d-%m-%Y') as createDate from userregister where accountId='" + accountId + "';" +
+  con.query("select *, DATE_FORMAT(createDate,'%Y-%m-%d') as createDate from userregister where accountId='" + accountId + "';" +
     "select id,carNumPlate,UID,status,DATE_FORMAT(availableDate,'%Y-%m-%d') as availableDate from carplate where accountId='" + accountId + "';" +
     "select UID as value from card where status=1", function (err, results) {
       if (err) res.send(err)
@@ -240,7 +240,7 @@ router.post('/updateUserData', async (req, res, next) => {
       return res.send(err)
     }
     var accountId = req.body.accountId
-    var username = req.body.username.toLowerCase().trim().replace(/  +/g, ' ')
+    var username = req.body.username.trim().replace(/  +/g, ' ')
     var phone = req.body.phone
     var address = req.body.address
     var email = req.body.email
@@ -279,6 +279,43 @@ router.post('/updateUserData', async (req, res, next) => {
   })
 })
 
+router.post('/updateUserOwnData', async (req, res, next) => {
+  con.beginTransaction(function (err) {
+    if (err) {
+      return res.send(err)
+    }
+    var accountId = req.body.accountId
+    var phone = req.body.phone
+    var address = req.body.address
+    var email = req.body.email
+    let promiseUpdateUser = () => {
+      return new Promise((resolve, reject) => {
+        con.query("update userregister " +
+          "set phone='" + phone + "', address='" + address + "',email='" + email + "' where accountId='" + accountId + "'",
+          function (err, result) {
+            if (err) {
+              return reject(err)
+            }
+            resolve(result)
+          })
+      })
+    }
+
+    let processQuery = async () => {
+      try {
+        await promiseUpdateUser()
+        await promiseCommit(res)
+      } catch (e) {
+        console.log(e)
+        con.rollback()
+        res.send(e)
+      }
+
+    }
+    processQuery()
+  })
+})
+
 router.post('/addUserData', async (req, res, next) => {
   con.beginTransaction(function (err) {
     if (err) {
@@ -296,8 +333,8 @@ router.post('/addUserData', async (req, res, next) => {
       try {
         let accountId = await promiseCreateAccountId(username)
         await promiseInsertAccount(accountId, '123456', 'user')
-        await promiseInsertUser(accountId, username, availableDate, phone, address, email, status)
-        for (var i = 0; i < listOfNewPlate.length; i++) await promiseAddNewCarPlate(listOfNewPlate[i].carNumPlate, accountId, listOfNewPlate[i].UID, listOfNewPlate[i].status)
+        await promiseInsertUser(accountId, username, 'admin', phone, address, email, status)
+        for (var i = 0; i < listOfNewPlate.length; i++) await promiseAddNewCarPlate(listOfNewPlate[i].carNumPlate, accountId, listOfNewPlate[i].UID, listOfNewPlate[i].availableDate, listOfNewPlate[i].status)
         await promiseCommit(res)
       } catch (e) {
         console.log(e)
@@ -350,9 +387,9 @@ let promiseUpdateCardStatus = (UID, status) => {
   })
 }
 
-let promiseInsertUser = (accountId, username, availableDate, phone, address, email, status) => {
+let promiseInsertUser = (accountId, username, createBy, phone, address, email, status) => {
   return new Promise((resolve, reject) => {
-    con.query("insert into userregister value ('" + accountId + "','" + username + "','administrator',now(),'" + availableDate + "','" + phone + "','" + address + "','" +
+    con.query("insert into userregister value ('" + accountId + "','" + username + "','" + createBy + "',now(),'" + phone + "','" + address + "','" +
       email + "'," + status + ")",
       function (err, result) {
         if (err) {
@@ -591,7 +628,16 @@ router.post('/login', async (req, res, next) => {
   const { username, password } = req.body;
   con.query("select s.accountId,s.fullname,s.phone,s.address,s.email,s.status,a.role from staff s join account a on s.accountId=a.accountId where a.accountId='" + username + "' and a.password='" + password + "' and s.status=1", function (err, results) {
     if (err) throw err
-    if (results.length == 0) res.status(404).send({ success: 0, message: "account Not found" })
+    if (results.length == 0) {
+      con.query("select s.accountId,s.username,s.phone,s.address,s.email,s.status,a.role from userregister s join account a on s.accountId=a.accountId where a.accountId='" + username + "' and a.password='" + password + "' and s.status=1", function (err, results) {
+        if (err) throw err
+        if (results.length == 0) res.status(404).send({ success: 0, message: "account Not found" })
+        if (results.length > 0) {
+          req.session.user = { username: results[0].accountId, role: results[0].role, fullname: results[0].username };
+          res.send({ success: 1, message: "Logged in!", results })
+        }
+      })
+    }
     if (results.length > 0) {
       req.session.user = { username: results[0].accountId, role: results[0].role, fullname: results[0].fullname };
       res.send({ success: 1, message: "Logged in!", results })
@@ -600,8 +646,8 @@ router.post('/login', async (req, res, next) => {
 })
 
 router.post('/changepassword', async (req, res, next) => {
-  const { newpassword ,repeat} = req.body;
-  if(newpassword != repeat){
+  const { newpassword, repeat } = req.body;
+  if (newpassword != repeat) {
     res.status(422).send({ success: 0, message: "Not true" })
   }
   con.query("UPDATE account SET password = '" + newpassword + "' WHERE accountId='" + req.session.user.username + "'", function (err, results) {
@@ -609,7 +655,7 @@ router.post('/changepassword', async (req, res, next) => {
     if (err) throw err
     if (results.changedRows == 0) res.status(404).send({ success: 0, message: "failed" })
     if (results.changedRows > 0) {
-      res.send({ success: 1, message: "Change Success!"})
+      res.send({ success: 1, message: "Change Success!" })
     }
   })
 })
@@ -619,9 +665,9 @@ router.post('/checkoldpass', async (req, res, next) => {
   con.query("select * from account s where s.accountId='" + req.session.user.username + "'", function (err, results) {
     if (err) throw err
     if (results[0].password === oldpassword) {
-      res.send({ success: 1, message: " Success!"})
+      res.send({ success: 1, message: " Success!" })
     }
-    else{
+    else {
       res.status(422).send({ success: 0, message: "Not true" })
     }
   })
@@ -630,15 +676,14 @@ router.post('/checkoldpass', async (req, res, next) => {
 
 
 router.get('/login/check', (req, res) => {
-  console.log(req.session.user.username)
   if (req.session.user) res.send({ success: 1, message: "success", user: req.session.user });
   else res.send({ success: 0, message: "failed" })
 })
 
 router.get("/logout", (req, res) => {
-  req.session.destroy((err) =>{
-      if(err) res.status(500).send({success:0 ,err })
-      else res.send({success: 1, message:"logged out!"})
+  req.session.destroy((err) => {
+    if (err) res.status(500).send({ success: 0, err })
+    else res.send({ success: 1, message: "logged out!" })
   })
 })
 
@@ -646,7 +691,7 @@ router.get('/fullname/:accountId', function (req, res, next) {
   var accountId = req.params['accountId']
   con.query("select s.accountId,s.fullname,s.phone,s.address,s.email,s.status,a.role from staff s join account a on s.accountId=a.accountId where s.accountId='" + accountId + "';", function (err, results) {
     if (err) res.send(err)
-    else res.send({success: 1, message:"logged out!", results})
+    else res.send({ success: 1, message: "logged out!", results })
   })
 })
 

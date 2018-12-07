@@ -15,10 +15,10 @@ import {
   AppSidebarNav,
 } from '@coreui/react';
 // sidebar nav config
-import { guestnav, usernav, staffnav, adminnav } from '../../_nav';
+import { guestnav, usernav, officernav, securitynav, adminnav } from '../../_nav';
 
 // routes config
-import { guest, admin, user, staff } from '../../routes';
+import { guest, admin, user, officer, security } from '../../routes';
 import DefaultAside from './DefaultAside';
 import DefaultFooter from './DefaultFooter';
 import DefaultHeader from './DefaultHeader';
@@ -27,7 +27,7 @@ import axios from 'axios';
 class DefaultLayout extends Component {
 
   state = {
-    fullname:"",
+    fullname: "",
     username: "",
     role: "",
     routes: guest,
@@ -38,24 +38,28 @@ class DefaultLayout extends Component {
     axios
       .get("/login/check").then(res => {
         if (res.data.user) {
-          console.log(res.data.user)
           this.setState({
             username: res.data.user.username,
             role: res.data.user.role,
             fullname: res.data.user.fullname
 
           })
-          if (res.data.user.role == "user")
+          if (res.data.user.role === "user")
             this.setState({
               routes: user,
               nav: usernav
             })
-          if (res.data.user.role == "staff")
+          if (res.data.user.role === "officer")
             this.setState({
-              routes: staff,
-              nav: staffnav
+              routes: officer,
+              nav: officernav
             })
-          if (res.data.user.role == "admin")
+          if (res.data.user.role === "security")
+            this.setState({
+              routes: security,
+              nav: securitynav
+            })
+          if (res.data.user.role === "admin")
             this.setState({
               routes: admin,
               nav: adminnav
@@ -64,11 +68,7 @@ class DefaultLayout extends Component {
       })
   }
 
-
-
-
   render() {
-    console.log(this.state)
     return (
       <div className="app">
         <AppHeader fixed>
@@ -87,8 +87,6 @@ class DefaultLayout extends Component {
             <Container fluid>
               <Switch>
                 {this.state.routes.map((route, idx) => {
-                  if (route.component) {
-                  }
                   return route.component ? (<Route key={idx} path={route.path} exact={route.exact} name={route.name} render={props => (
                     <route.component {...props} />
                   )} />)
