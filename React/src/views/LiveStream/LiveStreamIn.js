@@ -28,6 +28,7 @@ class LiveStreamIn extends Component {
         })
         this.socket.on("messageCardFromServer", res => {
             var result = JSON.parse(res)
+            console.log(result)
             this.setState({
                 cardStatus: result.status,
                 cardMessage: result.message
@@ -36,7 +37,7 @@ class LiveStreamIn extends Component {
     }
 
     printCardCard = () => {
-        if (this.state.cardStatus === 1) {
+        if (parseInt(this.state.cardStatus,10) === 1) {
             return (<Card>
                 <CardHeader>
                     Card Notification {this.state.ready?" (ready)":" (not ready)"}
@@ -47,7 +48,7 @@ class LiveStreamIn extends Component {
                 </CardBody>
             </Card>)
         }
-        if (this.state.cardStatus === 2) {
+        if (parseInt(this.state.cardStatus,10) === 2) {
             return (<Card>
                 <CardHeader>
                     Card Notification {this.state.ready?" (ready)":" (not ready)"}
@@ -58,7 +59,7 @@ class LiveStreamIn extends Component {
                 </CardBody>
             </Card>)
         }
-        if (this.state.cardStatus === 3) {
+        if (parseInt(this.state.cardStatus,10) === 3) {
             return (<Card>
                 <CardHeader>
                     Card Notification {this.state.ready?" (ready)":" (not ready)"}
@@ -79,7 +80,7 @@ class LiveStreamIn extends Component {
     }
 
     printPlateCard = () => {
-        if (this.state.plateStatus === 1) {
+        if (parseInt(this.state.plateStatus,10) === 1) {
             return (<Card>
                 <CardHeader>
                     Card Notification
@@ -90,7 +91,7 @@ class LiveStreamIn extends Component {
                 </CardBody>
             </Card>)
         }
-        if (this.state.plateStatus === 2) {
+        if (parseInt(this.state.plateStatus,10) === 2) {
             return (<Card>
                 <CardHeader>
                     Plate Detection Notification
@@ -101,7 +102,7 @@ class LiveStreamIn extends Component {
                 </CardBody>
             </Card>)
         }
-        if (this.state.plateStatus === 3) {
+        if (parseInt(this.state.plateStatus,10) === 3) {
             return (<Card>
                 <CardHeader>
                     Plate Detection Notification
@@ -128,7 +129,7 @@ class LiveStreamIn extends Component {
                     <Col>
                         <Iframe url="http://192.168.107.238:8081"
                             width="700px"
-                            height="900px"
+                            height="700px"
                             id="myId"
                             className="myClassname"
                             display="initial"

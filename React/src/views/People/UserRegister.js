@@ -24,11 +24,12 @@ class UserRegister extends Component {
             modalClick: false,
             errorModalClick: false,
             successModalClick: false,
-            accountId: ''
+            accountId: '',
+            role: ''
         };
     }
 
-    componentWillMount() {
+    componentDidMount() {
         if (this.state.data == null) {
             getUserRegisterData().then((res) => {
                 this.setState({
@@ -36,6 +37,13 @@ class UserRegister extends Component {
                 })
             })
         }
+        axios.get("/login/check").then(res => {
+            if (res.data.user) {
+                this.setState({
+                    role: res.data.user.role,
+                })
+            }
+        })
     }
 
     toggle(tab) {
@@ -100,7 +108,7 @@ class UserRegister extends Component {
                         <th>Created By</th>
                         <th>Plates</th>
                         <th>Status</th>
-                        <th>Action</th>
+                        {this.state.role !== "security" ? (<th>Action</th>) : (null)}
                     </tr>
                 </thead>
                 <tbody>
@@ -115,11 +123,13 @@ class UserRegister extends Component {
                             <td>
                                 <Badge color={value.status === 1 ? "success" : "danger"}>{value.status === 1 ? "Active" : "Deactive"}</Badge>
                             </td>
-                            <td>
-                                <Button className="fa fa-search-plus  mr-1 mb-1" color="success" href={"#/userregister/userdetail/" + value.accountId}></Button>
-                                <Button className="fa fa-edit mr-1 mb-1" color="info" href={"#/userregister/userupdate/" + value.accountId}></Button>
-                                <Button className="fa fa-trash-o mr-1 mb-1" color="danger" onClick={e => this.onRemoveClick(e, value.accountId)}></Button>
-                            </td>
+                            {this.state.role !== "security" ? (
+                                <td>
+                                    <Button className="fa fa-search-plus  mr-1 mb-1" color="success" href={"#/userregister/userdetail/" + value.accountId}></Button>
+                                    <Button className="fa fa-edit mr-1 mb-1" color="info" href={"#/userregister/userupdate/" + value.accountId}></Button>
+                                    <Button className="fa fa-trash-o mr-1 mb-1" color="danger" onClick={e => this.onRemoveClick(e, value.accountId)}></Button>
+                                </td>) :
+                                (null)}
                         </tr>
                     ))}
                     <Modal isOpen={this.state.modalClick} toggle={this.onRemoveModal} className='modal-primary' >
@@ -145,7 +155,7 @@ class UserRegister extends Component {
                     <Modal isOpen={this.state.successModalClick} toggle={this.onRemoveModal} className='modal-success' >
                         <ModalHeader toggle={this.onRemoveModal}>Remove Status</ModalHeader>
                         <ModalBody>
-                            Remove successfully! Move to Staff Page
+                            Remove successfully! Move to UserRegister Page
                             </ModalBody>
                         <ModalFooter>
                             <Button color="primary" onClick={this.onRemoveModal}>Close</Button>
@@ -192,9 +202,9 @@ class UserRegister extends Component {
                         <strong>User Register</strong>
                     </CardHeader>
                     <CardBody>
-                        <Row>
-                            <Button color="primary" href="#/userregister/useradd" style={{ marginBottom: '1rem' }}>Add New User</Button>
-                            <SearchFiled  onSearchChanged={this._onSearchChanged}/>
+                        <Row style={{ marginBottom: '1rem' }}>
+                            {this.state.role !== "security" ? (<Button color="primary" href="#/userregister/useradd">Add New User</Button>) : (null)}
+                            <SearchFiled onSearchChanged={this._onSearchChanged} />
                         </Row>
                         <Row>
                             {this.printUserData()}

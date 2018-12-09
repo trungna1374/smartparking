@@ -13,6 +13,7 @@ import LiveStreamOut from './views/LiveStream/LiveStreamOut';
 import UpdateOwner from './views/People/UpdateOwner';
 import UpdateProfileOwner from './views/People/UpdateProfileOwner';
 import UpdateProfileUser from './views/People/UpdateProfileUser';
+import Statistics from './views/Statistics/Statistics';
 
 // https://github.com/ReactTraining/react-router/tree/master/packages/react-router-config
 const admin = [
@@ -28,7 +29,9 @@ const admin = [
   { path: '/livestream/livestreamin', exact: true, name: 'Livestream Gate In', component: LiveStreamIn },
   { path: '/livestream/livestreamout', exact: true, name: 'Livestream Gate Out', component: LiveStreamOut },
   { path: '/updatepassword', exact: true, name: 'Update Password', component: UpdateOwner },
-  { path: '/updateprofile/:id', exact: true, name: 'Update Profile', component: UpdateProfileOwner },
+  { path: '/updateprofileStaff/:id', exact: true, name: 'Update Profile', component: UpdateProfileOwner },
+  { path: '/statistics', exact: true, name: 'Statistics', component: Statistics },
+  { path: '/updateprofileUser/:id', exact: true, name: 'Update Profile', component: UpdateProfileUser },
 ];
 
 const user = [
@@ -47,6 +50,7 @@ const officer = [
   { path: '/map', exact: true, name: 'Map', component: ParkLocation },
   { path: '/updatepassword', exact: true, name: 'Update Password', component: UpdateOwner },
   { path: '/updateprofile/:id', exact: true, name: 'Update Profile', component: UpdateProfileOwner },
+  { path: '/statistics', exact: true, name: 'Statistics', component: Statistics },
 ]
 
 const security = [

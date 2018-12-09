@@ -44,7 +44,7 @@ class DefaultHeader extends Component {
             <NavLink href="/">Dashboard</NavLink>
           </NavItem>
           <NavItem className="px-3">
-            <NavLink href="#/userregister">Users</NavLink>
+            <NavLink href={this.props.username.role==="user"?"#/updateprofileUser/"+this.props.username.username:"#/userregister"}>Users</NavLink>
           </NavItem>
         </Nav>
         <Nav className="ml-auto" navbar>
@@ -65,7 +65,7 @@ class DefaultHeader extends Component {
             </DropdownToggle>
             <DropdownMenu right style={{ right: 'auto' }}>
               <DropdownItem header tag="div" className="text-center"><strong>Account</strong></DropdownItem>
-              <DropdownItem href={"#/updateprofile/" +this.props.username.username}><i className="fa fa-bell-o"></i> Updates Profile<Badge color="info"></Badge></DropdownItem>
+              <DropdownItem href={this.props.username.role==="user"?"#/updateprofileUser/"+this.props.username.username:"#/updateprofileStaff/"+this.props.username.username}><i className="fa fa-bell-o"></i> Updates Profile<Badge color="info"></Badge></DropdownItem>
               <DropdownItem href="#/updatepassword"><i className="fa fa-bell-o"></i> Change Password<Badge color="info"></Badge></DropdownItem>
               <DropdownItem divider />
               <DropdownItem onClick={this._handleLogOut} href='/'><i className="fa fa-lock"></i> Logout</DropdownItem>

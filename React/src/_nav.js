@@ -108,6 +108,11 @@ const adminnav = {
         },
       ],
     },
+    {
+      name: 'Statistics',
+      url: '/statistics',
+      icon: 'icon-graph'
+    },
   ]
 }
 

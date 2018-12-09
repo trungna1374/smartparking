@@ -1,7 +1,6 @@
 var express = require('express')
 var router = express.Router()
 var mysql = require('mysql')
-const socketIO = require('socket.io')
 
 var con = mysql.createConnection({
   host: "localhost",
@@ -695,6 +694,41 @@ router.get('/fullname/:accountId', function (req, res, next) {
   })
 })
 
+router.get('/getHistoryByMonth', function (req, res, next) {
+  var month = req.query.month
+  var year = req.query.year
+  var option = req.query.option
+  con.query("select Day(createDate) as day, Count(Day(createDate)) as countNumber from parkHistory where Month(createDate) = " + month +
+    " and Year(createDate) = " + year + " and status = " + option + " Group by Day(createDate)", function (err, results) {
+      if (err) throw err
+      result = []
+      for (var i in results) {
+        obj = {
+          day: results[i].day,
+          countnumber: results[i].countNumber
+        }
+        result.push(obj)
+      }
+      res.json(result)
+    })
+})
 
+router.get('/getHistoryByYear', function (req, res, next) {
+  var year = req.query.year
+  var option = req.query.option
+  con.query("select Month(createDate) as month, Count(Month(createDate)) as countNumber from parkHistory where Year(createDate) = " + year +
+    " and status = " + option + " Group by Month(createDate)", function (err, results) {
+      if (err) throw err
+      result = []
+      for (var i in results) {
+        obj = {
+          month: results[i].month,
+          countnumber: results[i].countNumber
+        }
+        result.push(obj)
+      }
+      res.json(result)
+    })
+})
 
 module.exports = router;
