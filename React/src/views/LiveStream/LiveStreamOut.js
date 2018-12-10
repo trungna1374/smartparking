@@ -12,7 +12,7 @@ class LiveStreamOut extends Component {
             plateMessage: "",
             plateStatus: 0,
             ready:false,
-            endpoint: "http://192.168.107.238:8000",
+            endpoint: "http://192.168.107.246:8000",
         }
     }
     componentWillMount() {

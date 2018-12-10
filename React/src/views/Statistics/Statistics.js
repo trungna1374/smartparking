@@ -1,15 +1,11 @@
 import React, { Component } from 'react';
 import { Line } from 'react-chartjs-2';
 import {
-  Button,
-  ButtonGroup,
-  ButtonToolbar,
-  Card,
-  CardBody,
-  CardFooter,
-  CardTitle,
-  Col,
-  Row,
+  Button, ButtonToolbar,
+  Card, CardBody, CardFooter, CardTitle,
+  Col, Row,
+  Modal, ModalBody, ModalFooter, ModalHeader,
+  Input, Label, FormGroup
 } from 'reactstrap';
 import { CustomTooltips } from '@coreui/coreui-plugin-chartjs-custom-tooltips';
 import { getStyle } from '@coreui/coreui/dist/js/coreui-utilities'
@@ -20,6 +16,7 @@ const brandSuccess = getStyle('--success')
 const brandInfo = getStyle('--info')
 
 const monthName = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+const yearName = [2016, 2017, 2018]
 
 // Card Chart 1
 const cardChartData1 = {
@@ -72,7 +69,7 @@ const cardChartOpts1 = {
       borderWidth: 1,
     },
     point: {
-      radius: 4,
+      radius: 2,
       hitRadius: 10,
       hoverRadius: 4,
     },
@@ -84,7 +81,7 @@ const cardChartData2 = {
   datasets: [
     {
       label: 'Car go out',
-      backgroundColor: brandInfo,
+      backgroundColor: brandSuccess,
       borderColor: 'rgba(255,255,255,.55)',
       data: [],
     },
@@ -129,7 +126,7 @@ const cardChartOpts2 = {
       borderWidth: 1,
     },
     point: {
-      radius: 4,
+      radius: 2,
       hitRadius: 10,
       hoverRadius: 4,
     },
@@ -198,7 +195,7 @@ const mainChartOpts = {
       borderWidth: 1,
     },
     point: {
-      radius: 1,
+      radius: 2,
       hitRadius: 10,
       hoverRadius: 4,
       hoverBorderWidth: 3,
@@ -210,16 +207,19 @@ class Statistics extends Component {
   constructor(props) {
     super(props);
 
-    this.onRadioBtnClick = this.onRadioBtnClick.bind(this);
-
     this.state = {
-      radioSelected: 1,
+      chooseModalClick: false,
+      chooseByYear: false,
+      monthSelect: moment().format("MM"),
+      yearSelect: moment().format("YYYY"),
       mainChartState: mainChart,
       mainChartOptsState: mainChartOpts,
       cardChartData1State: cardChartData1,
-      cardChartOpts1State:cardChartOpts1,
+      cardChartOpts1State: cardChartOpts1,
       cardChartData2State: cardChartData2,
-      cardChartOpts2State:cardChartOpts2,
+      cardChartOpts2State: cardChartOpts2,
+      inSum: 0,
+      outSum: 0
     };
   }
 
@@ -228,28 +228,157 @@ class Statistics extends Component {
   getHistoryByYear = (data) => axios.get("/getHistoryByYear", data)
     .then((res) => res.data)
 
-  onRadioBtnClick(radioSelected) {
-    console.log(moment(moment().format("YYYY-MM"), "YYYY-MM").daysInMonth())
-    if (radioSelected === 1) this.getHistoryByMonth({ params: { month: 12, year: 2018, option: 0 } })
-    else this.getHistoryByYear({ params: { year: 2018, option: 0 } })
+  onBtnClick = () => {
     this.setState({
-      radioSelected: radioSelected,
-    });
+      chooseModalClick: true
+    })
   }
 
-  updateChartMonth = (data) => {
+  onRemoveModal = () => {
+    this.setState({
+      chooseModalClick: false,
+    })
+  }
+
+  onChangeValue = (event) => {
+    this.setState({
+      [event.target.name]: event.target.value
+    })
+  }
+
+  onSearchData = () => {
+    if (!this.state.chooseByYear) {
+      this.getHistoryByMonth({ params: { month: this.state.monthSelect, year: this.state.yearSelect } }).then(res => {
+        this.updateChartMonth(res, moment(this.state.yearSelectSelect + "-" + this.state.monthSelect, "YYYY-MM").daysInMonth())
+      })
+    } else {
+      this.getHistoryByYear({ params: { year: this.state.yearSelect } }).then(res => {
+        this.updateChartYear(res)
+      })
+
+    }
+    this.setState({
+      chooseModalClick: false,
+    })
+  }
+
+  onChangeModal = () => {
+    this.setState({
+      chooseByYear: !this.state.chooseByYear
+    })
+  }
+
+  updateChartMonth = (data, numberOfDay) => {
+    var dataMainChart = []
+    var dataInChart = []
+    var dataOutChart = []
+    var inSum = 0
+    var outSum = 0
     var mainChartClone = mainChart
-    
+    var mainChartOptsClone = mainChartOpts
+    var cardChartData1Clone = cardChartData1
+    var cardChartOpts1Clone = cardChartOpts1
+    var cardChartData2Clone = cardChartData2
+    var cardChartOpts2Clone = cardChartOpts2
+    for (var i = 0; i < numberOfDay; i++) {
+      dataMainChart.push(i + 1)
+      dataInChart.push(0)
+      dataOutChart.push(0)
+    }
+    for (var i in data) {
+      if (data[i].day <= numberOfDay) {
+        if (data[i].status === 0) {
+          dataInChart[data[i].day - 1] = data[i].countnumber
+          inSum += data[i].countnumber
+        } else {
+          dataOutChart[data[i].day - 1] = data[i].countnumber
+          outSum += data[i].countnumber
+        }
+      }
+    }
+    mainChartClone.labels = dataMainChart
+    mainChartClone.datasets[0].data = dataInChart
+    mainChartClone.datasets[1].data = dataOutChart
+    mainChartOptsClone.scales.yAxes[0].ticks.max = 50
+    mainChartOptsClone.scales.yAxes[0].ticks.stepSize = Math.ceil(50 / 5)
+
+    cardChartData1Clone.labels = dataMainChart
+    cardChartData1Clone.datasets[0].data = dataInChart
+    cardChartOpts1Clone.scales.yAxes[0].ticks.min = 0
+    cardChartOpts1Clone.scales.yAxes[0].ticks.max = Math.max.apply(Math, cardChartData1Clone.datasets[0].data) + 5
+
+    cardChartData2Clone.labels = dataMainChart
+    cardChartData2Clone.datasets[0].data = dataOutChart
+    cardChartOpts2Clone.scales.yAxes[0].ticks.min = 0
+    cardChartOpts2Clone.scales.yAxes[0].ticks.max = Math.max.apply(Math, cardChartData2Clone.datasets[0].data) + 5
+
+    this.setState({
+      mainChartState: mainChartClone,
+      mainChartOptsState: mainChartOptsClone,
+      cardChartData1State: cardChartData1Clone,
+      cardChartData2State: cardChartData2Clone,
+      cardChartOpts1State: cardChartOpts1Clone,
+      cardChartOpts2State: cardChartOpts2Clone,
+      inSum: inSum,
+      outSum: outSum
+    })
   }
 
   updateChartYear = (data) => {
-    
+    var dataInChart = []
+    var dataOutChart = []
+    var inSum = 0
+    var outSum = 0
+    var mainChartClone = mainChart
+    var mainChartOptsClone = mainChartOpts
+    var cardChartData1Clone = cardChartData1
+    var cardChartOpts1Clone = cardChartOpts1
+    var cardChartData2Clone = cardChartData2
+    var cardChartOpts2Clone = cardChartOpts2
+    for (var i = 0; i < 12; i++) {
+      dataInChart.push(0)
+      dataOutChart.push(0)
+    }
+    for (var i in data) {
+      if (data[i].status === 0) {
+        dataInChart[data[i].month - 1] = data[i].countnumber
+        inSum += data[i].countnumber
+      } else {
+        dataOutChart[data[i].month - 1] = data[i].countnumber
+        outSum += data[i].countnumber
+      }
+    }
+    mainChartClone.labels = monthName
+    mainChartClone.datasets[0].data = dataInChart
+    mainChartClone.datasets[1].data = dataOutChart
+    mainChartOptsClone.scales.yAxes[0].ticks.max = 50
+    mainChartOptsClone.scales.yAxes[0].ticks.stepSize = Math.ceil(50 / 5)
+
+    cardChartData1Clone.labels = monthName
+    cardChartData1Clone.datasets[0].data = dataInChart
+    cardChartOpts1Clone.scales.yAxes[0].ticks.min = 0
+    cardChartOpts1Clone.scales.yAxes[0].ticks.max = Math.max.apply(Math, cardChartData1Clone.datasets[0].data) + 5
+
+    cardChartData2Clone.labels = monthName
+    cardChartData2Clone.datasets[0].data = dataOutChart
+    cardChartOpts2Clone.scales.yAxes[0].ticks.min = 0
+    cardChartOpts2Clone.scales.yAxes[0].ticks.max = Math.max.apply(Math, cardChartData2Clone.datasets[0].data) + 5
+
+    this.setState({
+      mainChartState: mainChartClone,
+      mainChartOptsState: mainChartOptsClone,
+      cardChartData1State: cardChartData1Clone,
+      cardChartData2State: cardChartData2Clone,
+      cardChartOpts1State: cardChartOpts1Clone,
+      cardChartOpts2State: cardChartOpts2Clone,
+      inSum: inSum,
+      outSum: outSum
+    })
   }
 
   componentDidMount() {
-    console.log(moment(moment().format("YYYY-MM"), "YYYY-MM").daysInMonth())
-    this.getHistoryByMonth({ params: { month: moment().format("MM"), year: moment().format("YYYY"), option: 0 } }).then(res => {
-      console.log(res)
+    this.getHistoryByMonth({ params: { month: moment().format("MM"), year: moment().format("YYYY") } }).then(res => {
+      this.updateChartMonth(res, moment().format("DD"))
     })
   }
 
@@ -263,14 +392,11 @@ class Statistics extends Component {
                 <Row>
                   <Col sm="5">
                     <CardTitle className="mb-0">Park</CardTitle>
-                    <div className="small text-muted">November 2015</div>
+                    <div className="small text-muted">Dec 2018</div>
                   </Col>
                   <Col sm="7" className="d-none d-sm-inline-block">
                     <ButtonToolbar className="float-right" aria-label="Toolbar with button groups">
-                      <ButtonGroup className="mr-3" aria-label="First group">
-                        <Button color="outline-secondary" onClick={() => this.onRadioBtnClick(1)} active={this.state.radioSelected === 1}>Month</Button>
-                        <Button color="outline-secondary" onClick={() => this.onRadioBtnClick(2)} active={this.state.radioSelected === 2}>Year</Button>
-                      </ButtonGroup>
+                      <Button color="outline-primary" onClick={this.onBtnClick}>Change Time</Button>
                     </ButtonToolbar>
                   </Col>
                 </Row>
@@ -289,10 +415,10 @@ class Statistics extends Component {
           </Col>
         </Row>
         <Row>
-          <Col xs="12" sm="6" lg="3">
+          <Col xs="12" sm="6" lg="6">
             <Card className="text-white bg-info">
               <CardBody className="pb-0">
-                <div className="text-value">9.823</div>
+                <div className="text-value">{this.state.inSum}</div>
                 <div>Cars come in</div>
               </CardBody>
               <div className="chart-wrapper mx-3" style={{ height: '70px' }}>
@@ -301,10 +427,10 @@ class Statistics extends Component {
             </Card>
           </Col>
 
-          <Col xs="12" sm="6" lg="3">
+          <Col xs="12" sm="6" lg="6">
             <Card className="text-white bg-info">
               <CardBody className="pb-0">
-                <div className="text-value">9.823</div>
+                <div className="text-value">{this.state.outSum}</div>
                 <div>Cars go out</div>
               </CardBody>
               <div className="chart-wrapper mx-3" style={{ height: '70px' }}>
@@ -313,6 +439,40 @@ class Statistics extends Component {
             </Card>
           </Col>
         </Row>
+        <Modal isOpen={this.state.chooseModalClick} toggle={this.onRemoveModal} className='modal-primary' >
+          <ModalHeader toggle={this.onRemoveModal}>Choose a {this.state.chooseByYear ? "Year" : "Month"}</ModalHeader>
+          <ModalBody>
+            <Row>
+              {!this.state.chooseByYear ? (
+                <Col xs="12" md="4" >
+                  <Input type="select" name={"monthSelect"} id={"monthSelect"} onChange={this.onChangeValue} defaultValue={this.state.monthSelect} placeholder="Choose Month" required>
+                    {monthName.map((value1, key1) => (
+                      <option key={key1} value={key1 + 1}>{value1}</option>
+                    ))}
+                  </Input>
+                </Col>) : (null)}
+              <Col xs="12" md="4" >
+                <Input type="select" name={"yearSelect"} id={"yearSelect"} onChange={this.onChangeValue} defaultValue={this.state.yearSelect} placeholder="Choose Year" required>
+                  {yearName.map((value1, key1) => (
+                    <option key={key1} value={value1}>{value1}</option>
+                  ))}
+                </Input>
+              </Col>
+            </Row>
+          </ModalBody>
+          <ModalFooter>
+            <Row>
+              <Col xs="12">
+                <FormGroup check className="checkbox">
+                  <Input className="form-check-input" type="checkbox" id="checkbox1" name="checkMonthOrYear" checked={this.state.chooseByYear} onChange={this.onChangeModal} />
+                  <Label check className="form-check-label" htmlFor="checkbox1">Choose By Year</Label>
+                </FormGroup>
+              </Col>
+            </Row>
+            <Button color="primary" onClick={this.onSearchData}>View</Button>
+            <Button color="secondary" onClick={this.onRemoveModal}>Cancel</Button>
+          </ModalFooter>
+        </Modal>
       </div>
     );
   }

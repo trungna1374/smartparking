@@ -697,15 +697,15 @@ router.get('/fullname/:accountId', function (req, res, next) {
 router.get('/getHistoryByMonth', function (req, res, next) {
   var month = req.query.month
   var year = req.query.year
-  var option = req.query.option
-  con.query("select Day(createDate) as day, Count(Day(createDate)) as countNumber from parkHistory where Month(createDate) = " + month +
-    " and Year(createDate) = " + year + " and status = " + option + " Group by Day(createDate)", function (err, results) {
+  con.query("select Day(createDate) as day, Count(Day(createDate)) as countNumber,status from parkHistory where Month(createDate) = " + month +
+    " and Year(createDate) = " + year + " Group by Day(createDate), status", function (err, results) {
       if (err) throw err
       result = []
       for (var i in results) {
         obj = {
           day: results[i].day,
-          countnumber: results[i].countNumber
+          countnumber: results[i].countNumber,
+          status:results[i].status
         }
         result.push(obj)
       }
@@ -715,15 +715,15 @@ router.get('/getHistoryByMonth', function (req, res, next) {
 
 router.get('/getHistoryByYear', function (req, res, next) {
   var year = req.query.year
-  var option = req.query.option
-  con.query("select Month(createDate) as month, Count(Month(createDate)) as countNumber from parkHistory where Year(createDate) = " + year +
-    " and status = " + option + " Group by Month(createDate)", function (err, results) {
+  con.query("select Month(createDate) as month, Count(Month(createDate)) as countNumber ,status  from parkHistory where Year(createDate) = " + year +
+    " Group by Month(createDate), status", function (err, results) {
       if (err) throw err
       result = []
       for (var i in results) {
         obj = {
           month: results[i].month,
-          countnumber: results[i].countNumber
+          countnumber: results[i].countNumber,
+          status:results[i].status
         }
         result.push(obj)
       }
