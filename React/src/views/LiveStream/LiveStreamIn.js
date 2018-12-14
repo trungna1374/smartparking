@@ -12,7 +12,7 @@ class LiveStreamIn extends Component {
             plateMessage: "",
             plateStatus: 0,
             ready:false,
-            endpoint: "http://192.168.107.246:8000",
+            endpoint: "http://192.168.107.231:8000",
         }
     }
     componentWillMount() {
@@ -127,7 +127,7 @@ class LiveStreamIn extends Component {
             <div>
                 <Row>
                     <Col>
-                        <Iframe url="http://192.168.107.246:8081"
+                        <Iframe url="http://192.168.107.231:8082"
                             width="700px"
                             height="700px"
                             id="myId"

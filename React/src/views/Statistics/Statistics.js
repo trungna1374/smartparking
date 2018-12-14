@@ -285,7 +285,7 @@ class Statistics extends Component {
       dataInChart.push(0)
       dataOutChart.push(0)
     }
-    for (var i in data) {
+    for (i in data) {
       if (data[i].day <= numberOfDay) {
         if (data[i].status === 0) {
           dataInChart[data[i].day - 1] = data[i].countnumber
@@ -339,7 +339,7 @@ class Statistics extends Component {
       dataInChart.push(0)
       dataOutChart.push(0)
     }
-    for (var i in data) {
+    for (i in data) {
       if (data[i].status === 0) {
         dataInChart[data[i].month - 1] = data[i].countnumber
         inSum += data[i].countnumber

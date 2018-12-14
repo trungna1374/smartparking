@@ -11,8 +11,9 @@ class LiveStreamOut extends Component {
             cardStatus: 0,
             plateMessage: "",
             plateStatus: 0,
+            filename:"",
             ready:false,
-            endpoint: "http://192.168.107.246:8000",
+            endpoint: "http://192.168.107.231:8001",
         }
     }
     componentWillMount() {
@@ -29,6 +30,7 @@ class LiveStreamOut extends Component {
         this.socket.on("messageCardFromServer", res => {
             var result = JSON.parse(res)
             console.log(result)
+            if (result.filename!==undefined || result.filename!=='') this.setState({filename:result.filename})
             this.setState({
                 cardStatus: result.status,
                 cardMessage: result.message
@@ -127,7 +129,7 @@ class LiveStreamOut extends Component {
             <div>
                 <Row>
                     <Col>
-                        <Iframe url="http://192.168.107.238:8081"
+                        <Iframe url="http://192.168.107.231:8083"
                             width="700px"
                             height="700px"
                             id="myId"
@@ -139,6 +141,7 @@ class LiveStreamOut extends Component {
                     <Col xs="12" sm="6" md="4">
                         {this.printCardCard()}
                         {this.printPlateCard()}
+                        <img src={"\\in\\"+this.state.filename} height="360px" width="480px"/>
                     </Col>
 
                 </Row>
