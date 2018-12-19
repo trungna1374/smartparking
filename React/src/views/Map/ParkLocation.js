@@ -239,7 +239,7 @@ class ParkLocation extends Component {
                     </tr>
                     <tr>
                         <td>
-                            <h2>Incoming</h2>
+                            <h2>Cars in Park</h2>
                         </td>
                         <td style={{ padding: '15px' }}>
                             <h2>{this.state.selectedPlace.numOfCar}</h2>
@@ -247,9 +247,10 @@ class ParkLocation extends Component {
                     </tr>
                 </tbody>
             </table>
-            <ButtonGroup>
+            {this.state.role==="admin"?(<ButtonGroup>
                 <Button onClick={this.onRemoveParkClick}>Remove Park</Button>
-            </ButtonGroup>
+            </ButtonGroup>):(null)}
+            
         </div>
         );
         ReactDOM.render(React.Children.only(content), document.getElementById("parkwindowinfo"));

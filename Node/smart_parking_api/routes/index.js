@@ -262,7 +262,7 @@ router.post('/updateUserData', async (req, res, next) => {
 
     let processQuery = async () => {
       try {
-        for (var i = 0; i < listOfReleaseId.length; i++) await promiseUpdateCardStatus(listOfReleaseId[i].UID, 1)
+        for (var i = 0; i < listOfReleaseId.length; i++) await promiseUpdateCardStatus(listOfReleaseId[i].UID, 0)
         for (var i = 0; i < listOfNewPlate.length; i++) await promiseAddNewCarPlate(listOfNewPlate[i].carNumPlate, accountId, listOfNewPlate[i].UID, listOfNewPlate[i].availableDate, listOfNewPlate[i].status)
         for (var i = 0; i < listOfPlate.length; i++) await promiseUpdateCarPlate(listOfPlate[i].carNumPlate, listOfPlate[i].UID, listOfPlate[i].availableDate, listOfPlate[i].status, listOfPlate[i].id)
         await promiseUpdateUser()
