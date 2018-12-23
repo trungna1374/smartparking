@@ -23,7 +23,8 @@ class Staff extends Component {
             accountId: '',
             modalClick: false,
             errorModalClick: false,
-            successModalClick: false
+            successModalClick: false,
+            searchString: ''
         };
     }
 
@@ -84,8 +85,16 @@ class Staff extends Component {
             successModalClick: false
         })
     }
+    _onSearchChanged = text => this.setState({ searchString: text });
+
 
     printStaffData = () => {
+        let staffList = this.state.staffData;
+        if (this.state.staffData !== null && this.state.searchString.length !== 0) {
+            staffList = this.state.staffData.filter((staff) => {
+                return staff.fullname.toLowerCase().includes(this.state.searchString.toLowerCase()) || staff.accountId.toLowerCase().includes(this.state.searchString.toLowerCase())
+            });
+        }
         if (this.state.staffData != null) {
             return (<Table responsive hover>
                 <thead>
@@ -101,7 +110,7 @@ class Staff extends Component {
                     </tr>
                 </thead>
                 <tbody>
-                    {this.state.staffData.map((value, key) => (
+                    {staffList.map((value, key) => (
                         <tr key={key}>
                             <td>{value.accountId}</td>
                             <td>{value.fullname}</td>
@@ -186,11 +195,10 @@ class Staff extends Component {
                     <CardHeader>
                         <strong>Staff Management</strong>
                     </CardHeader>
-
                     <CardBody>
                         <Row>
                             <Button color="primary" href="#/staff/staffadd" style={{ marginBottom: '1rem' }}>Add New Staff</Button>
-                            <SearchFiled  onSearchChanged={this._onSearchChanged}/>
+                            <SearchFiled onSearchChanged={this._onSearchChanged} />
                         </Row>
                         <Row>
                             {this.printStaffData()}

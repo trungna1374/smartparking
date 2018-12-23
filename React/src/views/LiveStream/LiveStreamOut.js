@@ -13,7 +13,7 @@ class LiveStreamOut extends Component {
             plateStatus: 0,
             filename:"",
             ready:false,
-            endpoint: "http://192.168.107.237:8001",
+            endpoint: "http://169.254.231.97:8001",
         }
     }
     componentWillMount() {
@@ -129,7 +129,7 @@ class LiveStreamOut extends Component {
             <div>
                 <Row>
                     <Col>
-                        <Iframe url="http://192.168.107.237:8083"
+                        <Iframe url="http://169.254.231.97:8083"
                             width="700px"
                             height="700px"
                             id="myId"

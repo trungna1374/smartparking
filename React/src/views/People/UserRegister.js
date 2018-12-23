@@ -25,7 +25,8 @@ class UserRegister extends Component {
             errorModalClick: false,
             successModalClick: false,
             accountId: '',
-            role: ''
+            role: '',
+            searchString: ''
         };
     }
 
@@ -97,6 +98,12 @@ class UserRegister extends Component {
     _onSearchChanged = text => this.setState({ searchString: text });
 
     printUserData = () => {
+        let userList = this.state.data;
+        if (this.state.data !== null && this.state.searchString.length !== 0) {
+            userList = this.state.data.filter((user) => {
+                return user.username.toLowerCase().includes(this.state.searchString.toLowerCase()) || user.accountId.toLowerCase().includes(this.state.searchString.toLowerCase())
+            });
+        }
         if (this.state.data != null) {
             return (<Table responsive hover>
                 <thead>
@@ -112,7 +119,8 @@ class UserRegister extends Component {
                     </tr>
                 </thead>
                 <tbody>
-                    {this.state.data.map((value, key) => (
+
+                    {userList.map((value, key) => (
                         <tr key={key}>
                             <td>{value.accountId}</td>
                             <td>{value.username}</td>
