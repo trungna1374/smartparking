@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import {
-    Row, Badge, Button,
+    Row, Badge, Button, Col,
+    Input, Label,
     Table, Card, CardBody, CardHeader,
     Modal, ModalBody, ModalFooter, ModalHeader,
 } from 'reactstrap';
@@ -85,6 +86,12 @@ class Staff extends Component {
             successModalClick: false
         })
     }
+    onChangeShow = () => {
+        this.setState({
+            showAll: !this.state.showAll
+        })
+    }
+
     _onSearchChanged = text => this.setState({ searchString: text });
 
 
@@ -92,9 +99,21 @@ class Staff extends Component {
         let staffList = this.state.staffData;
         if (this.state.staffData !== null && this.state.searchString.length !== 0) {
             staffList = this.state.staffData.filter((staff) => {
-                return staff.fullname.toLowerCase().includes(this.state.searchString.toLowerCase()) || staff.accountId.toLowerCase().includes(this.state.searchString.toLowerCase())
+                if (this.state.showAll)
+                    return staff.fullname.toLowerCase().includes(this.state.searchString.toLowerCase()) || staff.accountId.toLowerCase().includes(this.state.searchString.toLowerCase())
+                else
+                    return (staff.fullname.toLowerCase().includes(this.state.searchString.toLowerCase()) || staff.accountId.toLowerCase().includes(this.state.searchString.toLowerCase()))
+                        && staff.status === 1
             });
-        }
+        } else
+            if (this.state.staffData !== null) {
+                staffList = this.state.staffData.filter((staff) => {
+                    if (this.state.showAll)
+                        return true
+                    else
+                        return staff.status === 1
+                });
+            }
         if (this.state.staffData != null) {
             return (<Table responsive hover>
                 <thead>
@@ -196,8 +215,14 @@ class Staff extends Component {
                         <strong>Staff Management</strong>
                     </CardHeader>
                     <CardBody>
-                        <Row>
-                            <Button color="primary" href="#/staff/staffadd" style={{ marginBottom: '1rem' }}>Add New Staff</Button>
+                        <Row style={{ marginBottom: '1rem' }}>
+                            {this.state.role !== "security" ? (<Col><Button color="primary" href="#/userregister/useradd">Add New Staff</Button></Col>) : (null)}
+                            <Col className="offset-6" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                                <div style={{ marginTop: '10px' }}>
+                                    <Input type="checkbox" checked={this.state.showAll} onChange={this.onChangeShow} />
+                                    <Label >Show all Staffs</Label>
+                                </div>
+                            </Col>
                             <SearchFiled onSearchChanged={this._onSearchChanged} />
                         </Row>
                         <Row>

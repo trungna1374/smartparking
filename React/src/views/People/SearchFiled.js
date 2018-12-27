@@ -5,7 +5,7 @@ class SearchField extends Component {
 
     render() {
         return (
-            <form className="offset-8 col-3">
+            <form className="col-3">
                 <input
                     onChange={this._handleTextChange}
                     className="form-control"

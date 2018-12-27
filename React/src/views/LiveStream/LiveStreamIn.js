@@ -11,7 +11,7 @@ class LiveStreamIn extends Component {
             cardStatus: 0,
             plateMessage: "",
             plateStatus: 0,
-            ready:false,
+            ready: false,
             endpoint: "http://169.254.231.97:8000",
         }
     }
@@ -23,7 +23,7 @@ class LiveStreamIn extends Component {
         })
         this.socket.on("message", res => {
             this.setState({
-                ready:true
+                ready: true
             })
         })
         this.socket.on("messageCardFromServer", res => {
@@ -34,13 +34,20 @@ class LiveStreamIn extends Component {
                 cardMessage: result.message
             })
         })
+        this.socket.on("messageCarFromServer", res => {
+            var result = JSON.parse(res)
+            this.setState({
+                plateStatus: result.status,
+                plateMessage: result.message
+            })
+        })
     }
 
     printCardCard = () => {
-        if (parseInt(this.state.cardStatus,10) === 1) {
+        if (parseInt(this.state.cardStatus, 10) === 1) {
             return (<Card>
                 <CardHeader>
-                    Card Notification {this.state.ready?" (ready)":" (not ready)"}
+                    Card Notification {this.state.ready ? " (ready)" : " (not ready)"}
                     <Badge pill color="success" className="float-right">pass</Badge>
                 </CardHeader>
                 <CardBody>
@@ -48,10 +55,10 @@ class LiveStreamIn extends Component {
                 </CardBody>
             </Card>)
         }
-        if (parseInt(this.state.cardStatus,10) === 2) {
+        if (parseInt(this.state.cardStatus, 10) === 2) {
             return (<Card>
                 <CardHeader>
-                    Card Notification {this.state.ready?" (ready)":" (not ready)"}
+                    Card Notification {this.state.ready ? " (ready)" : " (not ready)"}
                     <Badge pill color="warning" className="float-right">warning</Badge>
                 </CardHeader>
                 <CardBody>
@@ -59,10 +66,10 @@ class LiveStreamIn extends Component {
                 </CardBody>
             </Card>)
         }
-        if (parseInt(this.state.cardStatus,10) === 3) {
+        if (parseInt(this.state.cardStatus, 10) === 3) {
             return (<Card>
                 <CardHeader>
-                    Card Notification {this.state.ready?" (ready)":" (not ready)"}
+                    Card Notification {this.state.ready ? " (ready)" : " (not ready)"}
                     <Badge pill color="danger" className="float-right">hold</Badge>
                 </CardHeader>
                 <CardBody>
@@ -72,7 +79,7 @@ class LiveStreamIn extends Component {
         }
         return (<Card>
             <CardHeader>
-                Card Notification {this.state.ready?" (ready)":" (not ready)"}
+                Card Notification {this.state.ready ? " (ready)" : " (not ready)"}
             </CardHeader>
             <CardBody>
             </CardBody>
@@ -80,10 +87,10 @@ class LiveStreamIn extends Component {
     }
 
     printPlateCard = () => {
-        if (parseInt(this.state.plateStatus,10) === 1) {
+        if (parseInt(this.state.plateStatus, 10) === 1) {
             return (<Card>
                 <CardHeader>
-                    Card Notification
+                    Plate Detection Notification {this.state.ready ? " (ready)" : " (not ready)"}
                     <Badge pill color="success" className="float-right">pass</Badge>
                 </CardHeader>
                 <CardBody>
@@ -91,10 +98,10 @@ class LiveStreamIn extends Component {
                 </CardBody>
             </Card>)
         }
-        if (parseInt(this.state.plateStatus,10) === 2) {
+        if (parseInt(this.state.plateStatus, 10) === 2) {
             return (<Card>
                 <CardHeader>
-                    Plate Detection Notification
+                    Plate Detection Notification {this.state.ready ? " (ready)" : " (not ready)"}
                     <Badge pill color="warning" className="float-right">warning</Badge>
                 </CardHeader>
                 <CardBody>
@@ -102,10 +109,10 @@ class LiveStreamIn extends Component {
                 </CardBody>
             </Card>)
         }
-        if (parseInt(this.state.plateStatus,10) === 3) {
+        if (parseInt(this.state.plateStatus, 10) === 3) {
             return (<Card>
                 <CardHeader>
-                    Plate Detection Notification
+                    Plate Detection Notification {this.state.ready ? " (ready)" : " (not ready)"}
                     <Badge pill color="danger" className="float-right">hold</Badge>
                 </CardHeader>
                 <CardBody>
@@ -115,7 +122,7 @@ class LiveStreamIn extends Component {
         }
         return (<Card>
             <CardHeader>
-                Plate Detection Notification
+                Plate Detection Notification {this.state.ready ? " (ready)" : " (not ready)"}
             </CardHeader>
             <CardBody>
             </CardBody>

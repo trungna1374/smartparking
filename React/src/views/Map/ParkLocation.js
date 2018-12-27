@@ -247,10 +247,10 @@ class ParkLocation extends Component {
                     </tr>
                 </tbody>
             </table>
-            {this.state.role==="admin"?(<ButtonGroup>
+            {this.state.role === "admin" ? (<ButtonGroup>
                 <Button onClick={this.onRemoveParkClick}>Remove Park</Button>
-            </ButtonGroup>):(null)}
-            
+            </ButtonGroup>) : (null)}
+
         </div>
         );
         ReactDOM.render(React.Children.only(content), document.getElementById("parkwindowinfo"));
@@ -265,7 +265,7 @@ class ParkLocation extends Component {
                     </CardHeader>
 
                     <CardBody>
-                        <SelectPlacesAutocomplete onAddressSelect={this.onAddressSelect} />
+                        {this.state.role === "admin" ? (<SelectPlacesAutocomplete onAddressSelect={this.onAddressSelect} />) : (null)}
                         <br />
                         <ContextMenuTrigger id="mapContext">
                             <div id="map" style={{ height: 700, position: 'relative', overflow: 'hidden' }}>

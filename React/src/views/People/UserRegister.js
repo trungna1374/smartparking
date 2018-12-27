@@ -2,9 +2,10 @@ import React, { Component } from 'react';
 import SearchFiled from './SearchFiled'
 import {
     Badge, Button,
-    Table, Row,
+    Table, Row, Col,
     Card, CardBody, CardHeader,
     Modal, ModalBody, ModalFooter, ModalHeader,
+    Input, Label
 } from 'reactstrap';
 import axios from "axios";
 // import Pagination from "react-js-pagination";
@@ -26,7 +27,8 @@ class UserRegister extends Component {
             successModalClick: false,
             accountId: '',
             role: '',
-            searchString: ''
+            searchString: '',
+            showAll: false
         };
     }
 
@@ -94,6 +96,11 @@ class UserRegister extends Component {
             successModalClick: false
         })
     }
+    onChangeShow = () => {
+        this.setState({
+            showAll: !this.state.showAll
+        })
+    }
 
     _onSearchChanged = text => this.setState({ searchString: text });
 
@@ -101,9 +108,22 @@ class UserRegister extends Component {
         let userList = this.state.data;
         if (this.state.data !== null && this.state.searchString.length !== 0) {
             userList = this.state.data.filter((user) => {
-                return user.username.toLowerCase().includes(this.state.searchString.toLowerCase()) || user.accountId.toLowerCase().includes(this.state.searchString.toLowerCase())
+                console.log(((user.status === 1) !== this.state.showAll))
+                if (this.state.showAll)
+                    return (user.username.toLowerCase().includes(this.state.searchString.toLowerCase()) || user.accountId.toLowerCase().includes(this.state.searchString.toLowerCase()))
+                else
+                    return user.username.toLowerCase().includes(this.state.searchString.toLowerCase()) || user.accountId.toLowerCase().includes(this.state.searchString.toLowerCase())
+                        && user.status === 1
             });
-        }
+        } else
+            if (this.state.data !== null) {
+                userList = this.state.data.filter((user) => {
+                    if (this.state.showAll)
+                        return true
+                    else
+                        return user.status === 1
+                });
+            }
         if (this.state.data != null) {
             return (<Table responsive hover>
                 <thead>
@@ -211,7 +231,14 @@ class UserRegister extends Component {
                     </CardHeader>
                     <CardBody>
                         <Row style={{ marginBottom: '1rem' }}>
-                            {this.state.role !== "security" ? (<Button color="primary" href="#/userregister/useradd">Add New User</Button>) : (null)}
+
+                            {this.state.role !== "security" ? (<Col><Button color="primary" href="#/userregister/useradd">Add New Users</Button></Col>) : (null)}
+                            <Col className="offset-6" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                                <div style={{ marginTop: '10px' }}>
+                                    <Input type="checkbox" checked={this.state.showAll} onChange={this.onChangeShow} />
+                                    <Label >Show all User</Label>
+                                </div>
+                            </Col>
                             <SearchFiled onSearchChanged={this._onSearchChanged} />
                         </Row>
                         <Row>

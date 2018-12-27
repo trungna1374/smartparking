@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Button, Card, CardBody, CardGroup, Col, Container, Form, Input, InputGroup, InputGroupAddon, InputGroupText, Row } from 'reactstrap';
+import { Button, Card, CardBody, CardGroup, Col, Container, Form, Input, InputGroup, InputGroupAddon, InputGroupText, Row, Modal, ModalBody, ModalFooter, ModalHeader } from 'reactstrap';
 import axios from 'axios'
 
 class Login extends Component {
@@ -33,11 +33,19 @@ class Login extends Component {
           window.location.href = "/"
         }
         else {
-          alert("SAI TAI KHOAN")
+          this.setState({
+            updateErrorModalClick: true
+          })
         }
       }
       )
       .catch(err => console.error(err))
+  }
+
+  onRemoveModal = (event) => {
+    this.setState({
+        updateErrorModalClick: false
+    })
   }
 
   render() {
@@ -92,7 +100,16 @@ class Login extends Component {
                     </div>
                   </CardBody>
                 </Card>
-              </CardGroup>
+                </CardGroup>
+                <Modal isOpen={this.state.updateErrorModalClick} toggle={this.onRemoveModal} className='modal-danger' >
+                            <ModalHeader toggle={this.onRemoveModal}></ModalHeader>
+                            <ModalBody>
+                                  Username or password was incorrect
+                            </ModalBody>
+                            <ModalFooter>
+                                <Button onClick={this.onRemoveModal}>Close</Button>
+                            </ModalFooter>
+                        </Modal>
             </Col>
           </Row>
         </Container>
